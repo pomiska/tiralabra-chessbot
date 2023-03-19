@@ -12,7 +12,7 @@
 
 ### Ongelma ja aika-arviot
 
-Pyritään luomaan mahdollisimman hyvä shakkitekoäly, joka tasapainottelee mahdollisimman hyvien siirtojen sekä ajankäytön kanssa. Liian hitaat siirrot voivat johtaa häviämiseen ajan loppumisen vuoksi, mutta hävitä voi myös huonojen siirtojen takia. Yritetään löytää tasapaino näiden kahden väliltä etsimällä optimaali hakusyvyys minimax algoritmille, sekä yrítetään tehostaa minimax algoritmiäeri tavoin, jotta saadaan laadukkaampia siirtoja. Voisiko kenties hakusyvyyttä muuttaa kesken pelin jos aika meinaa loppua kesken?
+Pyritään luomaan mahdollisimman hyvä shakkitekoäly, joka tasapainottelee mahdollisimman hyvien siirtojen sekä ajankäytön kanssa. Liian hitaat siirrot voivat johtaa häviämiseen ajan loppumisen vuoksi, mutta hävitä voi myös huonojen siirtojen takia. Yritetään löytää tasapaino näiden kahden väliltä etsimällä optimaali hakusyvyys minimax algoritmille, sekä yritetään tehostaa minimax algoritmiä eri tavoin, jotta saadaan laadukkaampia siirtoja. Voisiko kenties hakusyvyyttä muuttaa kesken pelin jos aika meinaa loppua kesken?
 
 Minimax algoritmin aikavaativuus on O(n^m) ja tilavaativuus O(nm), jossa n on mahdollisten siirtojen määrä ja m on hakusyvyys. Alpha-beta karsinnalla tehostettuna paras mahdollinen aikavaativuus olisi O(n^(m/2)).
 
