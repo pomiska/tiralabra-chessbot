@@ -71,7 +71,8 @@ application {
 
 checkstyle {
     toolVersion '8.17'
-    ignoreFailures = true
+    ignoreFailures = false
+    maxWarnings = 0
 }
 
 check.dependsOn jacocoTestReport
