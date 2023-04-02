@@ -2,9 +2,9 @@
 
 ### Mitä olen tehnyt tällä viikolla?
 
--Otettu käyttöön Github Actions
--Otettu käyttöön Codecov testikattavuusraportit, lisätty README.md tiedostoon badge
--Otettu käyttöön checkstyle, gradlen buildaaminen epäonnistuu jos checkstyle tarkastukset eivät mene läpi
+- Otettu käyttöön Github Actions
+- Otettu käyttöön Codecov testikattavuusraportit, lisätty README.md tiedostoon badge
+- Otettu käyttöön checkstyle, gradlen buildaaminen epäonnistuu jos checkstyle tarkastukset eivät mene läpi
 
 ### Miten ohjelma on edistynyt?
 

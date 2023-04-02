@@ -2,9 +2,9 @@
 
 ### Mitä olen tehnyt tällä viikolla?
 
--Lichess käyttäjä botille ja botin setup
--Tarvittavien mallien luonti ja sovelluslogiikan ideointia
--Tutkimusta miten muut ovat hoitaneet sääntölogiikkaa ja listaa siirroista (lähteenä käytetty [https://www.chessprogramming.org/Main_Page](Chess Programming Wikiä))
+- Lichess käyttäjä botille ja botin setup  
+- Tarvittavien mallien luonti ja sovelluslogiikan ideointia
+- Tutkimusta miten muut ovat hoitaneet sääntölogiikkaa ja listaa siirroista (lähteenä käytetty [https://www.chessprogramming.org/Main_Page](Chess Programming Wikiä)
 
 ### Miten ohjelma on edistynyt?
 
