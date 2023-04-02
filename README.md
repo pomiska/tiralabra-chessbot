@@ -11,6 +11,7 @@ Kaikki itse toteutettu koodi löytyy kansiosta [src/main/java/datastructureproje
 | Viikko 1 | [Määrittelydokumentti](https://github.com/pomiska/tiralabra-chessbot/blob/master/documentation/tiralabra_dokumentaatio/maarittelydokumentti.md) |
 | Viikko 1 | [Viikkoraportti 1](https://github.com/pomiska/tiralabra-chessbot/blob/master/documentation/tiralabra_dokumentaatio/viikkoraportti1.md) |
 | Viikko 2 | [Viikkoraportti 2](https://github.com/pomiska/tiralabra-chessbot/blob/master/documentation/tiralabra_dokumentaatio/viikkoraportti2.md) |
+| Viikko 3 | [Viikkoraportti 3](https://github.com/pomiska/tiralabra-chessbot/blob/master/documentation/tiralabra_dokumentaatio/viikkoraportti3.md) |
 
 ## Ajankäyttö
 
@@ -18,4 +19,5 @@ Kaikki itse toteutettu koodi löytyy kansiosta [src/main/java/datastructureproje
 | --- | --- |
 | 1 | 4 |
 | 2 | 8 |
-| Yhteensä | 12 |
+| 3 | 3 |
+| Yhteensä | 15 |
