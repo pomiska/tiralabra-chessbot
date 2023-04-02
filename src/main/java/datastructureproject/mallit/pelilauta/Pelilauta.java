@@ -2,8 +2,6 @@ package datastructureproject.mallit.pelilauta;
 
 import java.util.ArrayList;
 
-import org.w3c.dom.traversal.TreeWalker;
-
 import datastructureproject.mallit.nappulat.Kuningas;
 import datastructureproject.mallit.nappulat.Kuningatar;
 import datastructureproject.mallit.nappulat.Lahetti;
