@@ -4,8 +4,7 @@
 
 - Lichess käyttäjä botille ja botin setup  
 - Tarvittavien mallien luonti ja sovelluslogiikan ideointia
-- Tutkimusta miten muut ovat hoitaneet sääntölogiikkaa ja listaa siirroista (lähteenä käytetty [https://www.chessprogramming.org/Main_Page](Chess Programming Wikiä)
-
+- Tutkimusta miten muut ovat hoitaneet sääntölogiikkaa ja listaa siirroista (lähteenä käytetty [Chess Programming Wikiä](https://www.chessprogramming.org/Main_Page)
 ### Miten ohjelma on edistynyt?
 
 Luotu tarvittavat mallit sääntölogiikkaa varten ja ideoitu siirtolistojen luontia.
