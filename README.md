@@ -1,4 +1,4 @@
-# Shakkitekoäly [![build](https://github.com/pomiska/tiralabra-chessbot/actions/workflows/gradle.yml/badge.svg)](https://github.com/pomiska/tiralabra-chessbot/actions/workflows/gradle.yml)[![codecov](https://codecov.io/gh/pomiska/tiralabra-chessbot/branch/master/graph/badge.svg?token=MvxvF7erhx)](https://codecov.io/gh/pomiska/tiralabra-chessbot)
+# Shakkitekoäly [![Java CI with Gradle](https://github.com/pomiska/tiralabra-chessbot/actions/workflows/gradle.yml/badge.svg)](https://github.com/pomiska/tiralabra-chessbot/actions/workflows/gradle.yml)[![codecov](https://codecov.io/gh/pomiska/tiralabra-chessbot/branch/master/graph/badge.svg?token=MvxvF7erhx)](https://codecov.io/gh/pomiska/tiralabra-chessbot)
 
 Shakkitekoäly kurssille TKT20010.
 
