@@ -4,7 +4,7 @@ Shakkitekoäly kurssille TKT20010.
 
 ## Palautukset
 
-Kaikki itse toteutettu koodi löytyy kansiosta [src/main/java/datastructureproject](https://github.com/pomiska/tiralabra-chessbot/tree/master/src/main/java/datastructureproject) ja dokumentaatio kansiosta [documentation/tiralabra_dokumentaatio](https://github.com/pomiska/tiralabra-chessbot/tree/master/documentation/tiralabra_dokumentaatio)
+Kaikki itse toteutettu koodi löytyy kansiosta [src/main/java/datastructureproject](https://github.com/pomiska/tiralabra-chessbot/tree/master/src/main/java/datastructureproject) sekä tiedostosta [MinunBot.java](https://github.com/pomiska/tiralabra-chessbot/blob/master/src/main/java/chess/bot/MinunBot.java) ja dokumentaatio kansiosta [documentation/tiralabra_dokumentaatio](https://github.com/pomiska/tiralabra-chessbot/tree/master/documentation/tiralabra_dokumentaatio)
 
 | Palautus | Dokumentti | 
 | --- | --- |
