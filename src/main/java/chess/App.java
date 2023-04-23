@@ -4,7 +4,7 @@
 package chess;
 
 import chess.bot.ChessBot;
-import chess.bot.TestBot;
+import chess.bot.MinunBot;
 import chess.connection.LichessAPI;
 import chess.model.Profile;
 import chess.connection.*;
@@ -30,12 +30,13 @@ public class App {
                 token = arg.substring(8);
             }
         }
-        
+
         /*
-        You need to place your bot implementation to the variable below.
-        Make sure it implements the interface ChessBot, and don't change the variable name!
-        */
-        ChessBot bot = new TestBot(); // Your bot here!
+         * You need to place your bot implementation to the variable below.
+         * Make sure it implements the interface ChessBot, and don't change the variable
+         * name!
+         */
+        ChessBot bot = new MinunBot(); // Your bot here!
 
         if (isLichess) {
             if (token == null) {
@@ -45,7 +46,7 @@ public class App {
             Profile myProfile = api.getAccount();
             System.out.println("Profile ID: " + myProfile.id);
             api.beginEventLoop();
-            
+
         } else {
 
             Long initialTime = System.currentTimeMillis();
