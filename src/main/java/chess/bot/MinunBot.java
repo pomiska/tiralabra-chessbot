@@ -9,14 +9,11 @@ import datastructureproject.Pelilauta;
 
 public class MinunBot implements ChessBot {
     private Pelilauta lauta;
-    private ArrayList<String> siirrot;
     private Random random;
 
     public MinunBot() {
         this.lauta = new Pelilauta();
         this.random = new Random();
-        this.siirrot = new ArrayList<>();
-
     }
 
     public String nextMove(GameState gamestate) {
@@ -26,19 +23,27 @@ public class MinunBot implements ChessBot {
         } else {
             vastustaja = Side.WHITE;
         }
-        if (gamestate.getMoveCount() > 0) {
-            lauta.siirraNappulaRuutuun(gamestate.getLatestMove().substring(0, 2),
-                    gamestate.getLatestMove().substring(2), vastustaja);
+        if (gamestate.getMoveCount() > 0) { // Haetaan vastustajan viimeksi tekemä siirto ennen oman siirron tekemistä
+            String siirto = gamestate.getLatestMove();
+            if (siirto.length() == 4) {
+                lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2), vastustaja);
+            } else if (siirto.length() == 5) {
+                lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2, 4), vastustaja,
+                        siirto.substring(4));
+            }
         }
-        siirrot.clear();
+        ArrayList<String> siirrot = new ArrayList<>();
         siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
         try {
             if (siirrot.size() > 0) {
                 String siirto = siirrot.get(random.nextInt(siirrot.size()));
-                lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2), gamestate.playing);
+                if (siirto.length() == 4) {
+                    lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2), gamestate.playing);
+                } else if (siirto.length() == 5) {
+                    lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2, 4), gamestate.playing, "q");
+                }
                 System.out.println("lahto: " + siirto.substring(0, 2));
                 System.out.println("kohde: " + siirto.substring(2));
-                System.out.println("playing: " + gamestate.playing);
                 return siirto;
             } else {
                 return null;

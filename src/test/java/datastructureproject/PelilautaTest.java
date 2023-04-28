@@ -11,14 +11,6 @@ public class PelilautaTest {
     public PelilautaTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
     @Before
     public void setUp() {
         this.lauta = new Pelilauta();
@@ -70,10 +62,21 @@ public class PelilautaTest {
 
     @Test
     public void siirtaminenToimiiOikein() {
-        assertEquals(this.lauta.getNappulaRuudusta("a2"), NappulaTyyppi.SOTILAS);
-        this.lauta.siirraNappulaRuutuun("a2", "a4", Side.WHITE);
-        assertEquals(this.lauta.getNappulaRuudusta("a4"), NappulaTyyppi.SOTILAS);
-        assertEquals(this.lauta.getNappulaRuudusta("a2"), null);
+        assertEquals(this.lauta.getNappulaRuudusta("e2"), NappulaTyyppi.SOTILAS);
+        this.lauta.siirraNappulaRuutuun("e2", "e4", Side.WHITE);
+        assertEquals(this.lauta.getNappulaRuudusta("e4"), NappulaTyyppi.SOTILAS);
+        assertEquals(this.lauta.getNappulaRuudusta("e2"), null);
+
+        assertEquals(this.lauta.getNappulaRuudusta("d7"), NappulaTyyppi.SOTILAS);
+        this.lauta.siirraNappulaRuutuun("d7", "d5", Side.BLACK);
+        assertEquals(this.lauta.getNappulaRuudusta("d5"), NappulaTyyppi.SOTILAS);
+        assertEquals(this.lauta.getNappulaRuudusta("d7"), null);
+
+        assertEquals(this.lauta.getNappulaRuudusta("e4"), NappulaTyyppi.SOTILAS);
+        this.lauta.siirraNappulaRuutuun("e4", "d5", Side.WHITE);
+        assertEquals(this.lauta.getNappulaRuudusta("d5"), NappulaTyyppi.SOTILAS);
+        this.lauta.siirraNappulaRuutuun("e4", "d5", Side.WHITE);
+        assertEquals(this.lauta.getNappulaRuudusta("e4"), null);
     }
 
 }

@@ -8,7 +8,7 @@ import chess.model.Side;
 public class Pelilauta {
 
     private HashMap<String, NappulaTyyppi> valkoiset; // Tallennetaan kummankin puolen nappuloista tieto tyylillä
-                                                      // <Ruutu, Nappula>
+                                                      // <Ruutu, NappulaTyyppi>
     private HashMap<String, NappulaTyyppi> mustat;
 
     public Pelilauta() {
@@ -64,10 +64,25 @@ public class Pelilauta {
         poistaNappulaRuudusta(lahtoRuutu, puoli);
     }
 
+    public void siirraNappulaRuutuun(String lahtoRuutu, String kohdeRuutu, Side puoli, String korotus) {
+        NappulaTyyppi k = null;
+        if (korotus.equals("q")) {
+            k = NappulaTyyppi.KUNINGATAR;
+        } else if (korotus.equals("r")) {
+            k = NappulaTyyppi.TORNI;
+        } else if (korotus.equals("n")) {
+            k = NappulaTyyppi.RATSU;
+        } else if (korotus.equals("b")) {
+            k = NappulaTyyppi.LAHETTI;
+        }
+        asetaNappulaRuutuun(kohdeRuutu, puoli, k);
+        poistaNappulaRuudusta(lahtoRuutu, puoli);
+    }
+
     private void asetaNappulaRuutuun(String ruutu, Side puoli, NappulaTyyppi tyyppi) {
         if (puoli == Side.WHITE) {
             valkoiset.put(ruutu, tyyppi);
-            if (mustat.containsKey(ruutu)) {
+            if (mustat.containsKey(ruutu)) { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
                 mustat.remove(ruutu);
             }
         } else if (puoli == Side.BLACK) {
@@ -94,10 +109,10 @@ public class Pelilauta {
         } else {
             siirrot = sg.mustanSiirrot();
         }
-        return sg.poistaValkoisenLaittomatSiirrot(siirrot);
+        return sg.poistaLaittomatSiirrot(siirrot);
     }
 
-    public NappulaTyyppi getNappulaRuudusta(String ruutu) {
+    public NappulaTyyppi getNappulaRuudusta(String ruutu) { // Yksikkötestejä varten getteri
         if (valkoiset.containsKey(ruutu)) {
             return valkoiset.get(ruutu);
         }
@@ -105,5 +120,33 @@ public class Pelilauta {
             return mustat.get(ruutu);
         }
         return null;
+    }
+
+    public HashMap<String, NappulaTyyppi> getValkoiset() { // Yksikkötestejä varten
+        return valkoiset;
+    }
+
+    public HashMap<String, NappulaTyyppi> getMustat() { // Yksikkötestejä varten
+        return mustat;
+    }
+
+    public void pelaaSiirrot(String siirrot) { // Yksikkötestejä varten
+        String[] s = siirrot.split(" ");
+        Side puoli = null;
+        for (int i = 0; i < s.length; i++) {
+            String lahtoruutu = s[i].substring(0, 2);
+            String kohderuutu = s[i].substring(2, 4);
+            if (i == 0 || (i % 2) == 0) {
+                puoli = Side.WHITE;
+            } else {
+                puoli = Side.BLACK;
+            }
+            if (s[i].length() == 5) {
+                String korotus = s[i].substring(4);
+                siirraNappulaRuutuun(lahtoruutu, kohderuutu, puoli, korotus);
+                continue;
+            }
+            siirraNappulaRuutuun(lahtoruutu, kohderuutu, puoli);
+        }
     }
 }
