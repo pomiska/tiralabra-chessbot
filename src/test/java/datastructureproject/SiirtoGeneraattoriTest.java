@@ -6,11 +6,11 @@ import java.util.*;
 
 import org.junit.*;
 import com.github.bhlangonijr.chesslib.*; // Käytetään valmista kirjastoa siirtojen testaamisessa, koska tiedetään varmasti että se generoi kaikki lailliset siirrot
-import com.github.bhlangonijr.chesslib.move.*; //
+import com.github.bhlangonijr.chesslib.move.*;
 
 import chess.model.Side;
 
-public class SiirtoGeneraattoriTest {
+public class SiirtoGeneraattoriTest { // Test
 
     SiirtoGeneraattori sg;
     Pelilauta lauta;

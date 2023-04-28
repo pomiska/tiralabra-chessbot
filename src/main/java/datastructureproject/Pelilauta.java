@@ -9,7 +9,7 @@ public class Pelilauta {
 
     private HashMap<String, NappulaTyyppi> valkoiset; // Tallennetaan kummankin puolen nappuloista tieto tyylillä
                                                       // <Ruutu, NappulaTyyppi>
-    private HashMap<String, NappulaTyyppi> mustat;
+    private HashMap<String, NappulaTyyppi> mustat; //
 
     public Pelilauta() {
         this.valkoiset = new HashMap<>();

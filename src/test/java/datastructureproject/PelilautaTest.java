@@ -4,7 +4,7 @@ import chess.model.Side;
 import static org.junit.Assert.assertEquals;
 import org.junit.*;
 
-public class PelilautaTest {
+public class PelilautaTest { // Test
 
     Pelilauta lauta;
 

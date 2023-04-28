@@ -9,7 +9,8 @@ public class SiirtoGeneraattori {
 
     private HashMap<String, NappulaTyyppi> valkoiset;
     private HashMap<String, NappulaTyyppi> mustat;
-    private ArrayList<String> suojatut; // Nappulat joita kuningas ei voi napata, koska joku muu nappula suojaa niitä
+    private ArrayList<String> suojatut; // Nappulat joita kuningas ei voi napata, koska joku muu vastustajan nappula
+                                        // suojaa niitä
     private ArrayList<String> omatNappulat;
     private ArrayList<String> vastustajanNappulat;
     private ArrayList<String> linjat;

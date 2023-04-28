@@ -51,7 +51,7 @@ public class MinunBot implements ChessBot {
         } catch (Exception e) {
             System.out.println("ERROR MAKING MOVE: " + e.getMessage());
         }
-        return nextMove(gamestate);
+        return null;
     }
 
 }
