@@ -149,4 +149,14 @@ public class Pelilauta {
             siirraNappulaRuutuun(lahtoruutu, kohderuutu, puoli);
         }
     }
+
+    public void setValkoiset(HashMap<String, NappulaTyyppi> v) {
+        valkoiset.clear();
+        valkoiset = v;
+    }
+
+    public void setMustat(HashMap<String, NappulaTyyppi> m) {
+        mustat.clear();
+        mustat = m;
+    }
 }

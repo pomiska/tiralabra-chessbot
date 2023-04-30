@@ -14,9 +14,6 @@ public class SiirtoGeneraattori {
     private ArrayList<String> omatNappulat;
     private ArrayList<String> vastustajanNappulat;
     private ArrayList<String> linjat;
-    private HashMap<String, String> kiinnitetyt; // Tallennetaan tieto minkä ruutujen nappulat on kiinnitetty
-                                                 // kuninkaaseen
-    // tyylillä <kiinnitettyRuutu, kiinnittäväRuutu>
     private Side puoli;
     private String shakittaja;
 
@@ -27,7 +24,6 @@ public class SiirtoGeneraattori {
         this.omatNappulat = new ArrayList<>();
         this.vastustajanNappulat = new ArrayList<>();
         this.suojatut = new ArrayList<>();
-        this.kiinnitetyt = new HashMap<>();
         this.puoli = puoli;
 
         this.linjat = new ArrayList<>();
@@ -545,15 +541,31 @@ public class SiirtoGeneraattori {
         return siirrot;
     }
 
-    private void etsiValkoisenKiinnitetytRuudut() { // Eli ruudut, joista nappulaa ei voi siirtää sillä kuningas
-                                                    // joutuisi shakkiin
+    private HashMap<String, String> etsiKiinnitetytRuudut() { // Eli ruudut, joista nappulaa ei voi siirtää
+                                                              // sillä kuningas
+        // joutuisi shakkiin
         String kuninkaanRuutu = "";
-        kiinnitetyt.clear();
-        for (HashMap.Entry<String, NappulaTyyppi> set : valkoiset.entrySet()) {
-            if (set.getValue() == NappulaTyyppi.KUNINGAS) {
-                kuninkaanRuutu = set.getKey();
-                break;
+        HashMap<String, String> kiinnitetyt = new HashMap<>();
+        HashMap<String, NappulaTyyppi> omat = new HashMap<>();
+        HashMap<String, NappulaTyyppi> vastustajan = new HashMap<>();
+        if (puoli == Side.WHITE) {
+            for (HashMap.Entry<String, NappulaTyyppi> set : valkoiset.entrySet()) {
+                if (set.getValue() == NappulaTyyppi.KUNINGAS) {
+                    kuninkaanRuutu = set.getKey();
+                    break;
+                }
             }
+            omat = valkoiset;
+            vastustajan = mustat;
+        } else {
+            for (HashMap.Entry<String, NappulaTyyppi> set : mustat.entrySet()) {
+                if (set.getValue() == NappulaTyyppi.KUNINGAS) {
+                    kuninkaanRuutu = set.getKey();
+                    break;
+                }
+            }
+            omat = mustat;
+            vastustajan = valkoiset;
         }
         int rivi = Character.getNumericValue(kuninkaanRuutu.charAt(1));
         String linja = String.valueOf(kuninkaanRuutu.charAt(0));
@@ -563,20 +575,20 @@ public class SiirtoGeneraattori {
 
         for (int i = linjat.indexOf(linja) + 1; i < linjat.size(); i++) { // Oikealle vaaka
             ruutu = linjat.get(i) + String.valueOf(rivi);
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -591,20 +603,20 @@ public class SiirtoGeneraattori {
 
         for (int i = linjat.indexOf(linja) - 1; i > 0; i--) { // Vasemmalle vaaka
             ruutu = linjat.get(i) + String.valueOf(rivi);
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -618,21 +630,21 @@ public class SiirtoGeneraattori {
         kiinnittavaRuutu = "";
 
         for (int i = rivi + 1; i <= 8; i++) { // Ylös
-            ruutu = linja + String.valueOf(rivi);
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            ruutu = linja + String.valueOf(i);
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -646,21 +658,21 @@ public class SiirtoGeneraattori {
         kiinnittavaRuutu = "";
 
         for (int i = rivi - 1; i > 0; i--) { // Alas
-            ruutu = linja + String.valueOf(rivi);
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            ruutu = linja + String.valueOf(i);
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.TORNI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.TORNI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -674,26 +686,26 @@ public class SiirtoGeneraattori {
         kiinnittavaRuutu = "";
 
         int linjaI = linjat.indexOf(linja) + 1;
-        for (int i = rivi + 1; i < 8; i++) { // Oikealle ylös vinoon
+        for (int i = rivi + 1; i <= 8; i++) { // Oikealle ylös vinoon
             if (linjaI > 7) {
                 break;
             }
             ruutu = linjat.get(linjaI) + String.valueOf(i);
             linjaI++;
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -713,21 +725,20 @@ public class SiirtoGeneraattori {
             }
             ruutu = linjat.get(linjaI) + String.valueOf(i);
             linjaI--;
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -747,20 +758,20 @@ public class SiirtoGeneraattori {
             }
             ruutu = linjat.get(linjaI) + String.valueOf(i);
             linjaI++;
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -774,27 +785,26 @@ public class SiirtoGeneraattori {
         kiinnittavaRuutu = "";
 
         linjaI = linjat.indexOf(linja) - 1;
-        for (int i = rivi + 1; i < 8; i++) { // Vasemmalle ylös vinoon
+        for (int i = rivi + 1; i <= 8; i++) { // Vasemmalle ylös vinoon
             if (linjaI < 0) {
                 break;
             }
             ruutu = linjat.get(linjaI) + String.valueOf(i);
             linjaI--;
-            if (!kiinnitettyRuutu.isEmpty() && valkoiset.containsKey(ruutu)) {
+            if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-
-            if (mustat.containsKey(ruutu) && (mustat.get(ruutu) != NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) != NappulaTyyppi.KUNINGATAR)) {
+            if (vastustajan.containsKey(ruutu) && !(vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR)) {
                 kiinnitettyRuutu = "";
                 break;
             }
-            if (valkoiset.containsKey(ruutu)) {
+            if (omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = ruutu;
             }
-            if (mustat.get(ruutu) == NappulaTyyppi.LAHETTI
-                    || mustat.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
+            if (vastustajan.get(ruutu) == NappulaTyyppi.LAHETTI
+                    || vastustajan.get(ruutu) == NappulaTyyppi.KUNINGATAR) {
                 kiinnittavaRuutu = ruutu;
                 break;
             }
@@ -804,8 +814,7 @@ public class SiirtoGeneraattori {
             kiinnitetyt.put(kiinnitettyRuutu, kiinnittavaRuutu);
         }
 
-        kiinnitettyRuutu = "";
-        kiinnittavaRuutu = "";
+        return kiinnitetyt;
     }
 
     public Boolean onkoShakissa(Side omaPuoli) {
@@ -886,58 +895,72 @@ public class SiirtoGeneraattori {
         int linjaI = linjat.indexOf(linja);
         int sLinjaI = linjat.indexOf(sLinja);
         if (shakittajanTyyppi == NappulaTyyppi.TORNI || shakittajanTyyppi == NappulaTyyppi.KUNINGATAR) {
-            ArrayList<String> shakittajanSiirrot = torninSiirrot(shakittaja);
-            if (linjaI == sLinjaI) {
-                if (rivi < sRivi && rivi > 1) {
-                    kuninkaanTakainenRuutu = linja + String.valueOf(rivi - 1);
-                } else if (rivi > sRivi && rivi < 8) {
-                    kuninkaanTakainenRuutu = linja + String.valueOf(rivi + 1);
-                }
-                for (int i = 0; i < shakittajanSiirrot.size(); i++) {
-                    if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)
-                            && shakittajanSiirrot.get(i).substring(2, 3).equals(linja)) {
-                        blockaavatRuudut.add(shakittajanSiirrot.get(i).substring(2));
+            if (rivi == sRivi || linjaI == sLinjaI) { // Ettei kuningattaren torni ja lähettisiirrot mene sekaisin
+                ArrayList<String> shakittajanSiirrot = new ArrayList<>();
+                if (linjaI == sLinjaI) {
+                    if (rivi < sRivi) {
+                        shakittajanSiirrot = torniAlas(shakittaja);
+                    } else {
+                        shakittajanSiirrot = torniYlos(shakittaja);
                     }
-                }
-            } else if (rivi == sRivi) {
-                if (linjaI < sLinjaI && linjaI > 0) {
-                    kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf(rivi);
-                } else if (linjaI > sLinjaI && linjaI < 7) {
-                    kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf(rivi);
-                }
-                for (int i = 0; i < shakittajanSiirrot.size(); i++) {
-                    if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)
-                            && rivi == Character.getNumericValue(shakittaja.charAt(1))) {
-                        blockaavatRuudut.add(shakittajanSiirrot.get(i).substring(2));
+                    if (rivi < sRivi && rivi > 1) {
+                        kuninkaanTakainenRuutu = linja + String.valueOf(rivi - 1);
+                    } else if (rivi > sRivi && rivi < 8) {
+                        kuninkaanTakainenRuutu = linja + String.valueOf(rivi + 1);
+                    }
+                    for (int i = 0; i < shakittajanSiirrot.size(); i++) {
+                        if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)
+                                && shakittajanSiirrot.get(i).substring(2, 3).equals(linja)) {
+                            blockaavatRuudut.add(shakittajanSiirrot.get(i).substring(2));
+                        }
+                    }
+                } else if (rivi == sRivi) {
+                    if (linjaI < sLinjaI) {
+                        shakittajanSiirrot = torniVasemmalle(shakittaja);
+                    } else {
+                        shakittajanSiirrot = torniOikealle(shakittaja);
+                    }
+                    if (linjaI < sLinjaI && linjaI > 0) {
+                        kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf(rivi);
+                    } else if (linjaI > sLinjaI && linjaI < 7) {
+                        kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf(rivi);
+                    }
+                    for (int i = 0; i < shakittajanSiirrot.size(); i++) {
+                        if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)
+                                && rivi == Character.getNumericValue(shakittaja.charAt(1))) {
+                            blockaavatRuudut.add(shakittajanSiirrot.get(i).substring(2));
+                        }
                     }
                 }
             }
         } else if (shakittajanTyyppi == NappulaTyyppi.LAHETTI || shakittajanTyyppi == NappulaTyyppi.KUNINGATAR) {
-            ArrayList<String> shakittajanSiirrot = new ArrayList<>();
-            if (rivi < sRivi && linjaI < sLinjaI) {
-                shakittajanSiirrot = lahettiVasemmalleAlas(shakittaja);
-                if (rivi > 1 && linjaI > 0) {
-                    kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf((rivi - 1));
+            if (rivi != sRivi && linjaI != sLinjaI) { // Ettei kuningattaren torni ja lähettisiirrot mene sekaisin
+                ArrayList<String> shakittajanSiirrot = new ArrayList<>();
+                if (rivi < sRivi && linjaI < sLinjaI) {
+                    shakittajanSiirrot = lahettiVasemmalleAlas(shakittaja);
+                    if (rivi > 1 && linjaI > 0) {
+                        kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf((rivi - 1));
+                    }
+                } else if (rivi > sRivi && linjaI < sLinjaI) {
+                    shakittajanSiirrot = lahettiVasemmalleYlos(shakittaja);
+                    if (rivi < 8 && linjaI > 0) {
+                        kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf((rivi + 1));
+                    }
+                } else if (rivi < sRivi && linjaI > sLinjaI) {
+                    shakittajanSiirrot = lahettiOikealleAlas(shakittaja);
+                    if (rivi > 1 && linjaI < 7) {
+                        kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf((rivi - 1));
+                    }
+                } else if (rivi > sRivi && linjaI > sLinjaI) {
+                    shakittajanSiirrot = lahettiOikealleYlos(shakittaja);
+                    if (rivi < 8 && linjaI < 7) {
+                        kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf((rivi + 1));
+                    }
                 }
-            } else if (rivi > sRivi && linjaI < sLinjaI) {
-                shakittajanSiirrot = lahettiVasemmalleYlos(shakittaja);
-                if (rivi < 8 && linjaI > 0) {
-                    kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf((rivi + 1));
-                }
-            } else if (rivi < sRivi && linjaI > sLinjaI) {
-                shakittajanSiirrot = lahettiOikealleAlas(shakittaja);
-                if (rivi > 1 && linjaI < 7) {
-                    kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf((rivi - 1));
-                }
-            } else if (rivi > sRivi && linjaI > sLinjaI) {
-                shakittajanSiirrot = lahettiOikealleYlos(shakittaja);
-                if (rivi < 8 && linjaI < 7) {
-                    kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf((rivi + 1));
-                }
-            }
-            for (int i = 0; i < shakittajanSiirrot.size(); i++) {
-                if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)) {
-                    blockaavatRuudut.add(shakittajanSiirrot.get(i).substring(2));
+                for (int i = 0; i < shakittajanSiirrot.size(); i++) {
+                    if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)) {
+                        blockaavatRuudut.add(shakittajanSiirrot.get(i).substring(2));
+                    }
                 }
             }
         }
@@ -1017,29 +1040,17 @@ public class SiirtoGeneraattori {
         laillisetSiirrot = poistaKuninkaanLaittomat(siirrot);
         if (onkoShakissa(puoli)) {
             System.out.println("SHAKISSA");
-            System.out.println("SHAKISSA");
-            System.out.println("SHAKISSA");
-            System.out.println("SHAKISSA");
-            System.out.println("SHAKISSA");
             return poistaShakki(laillisetSiirrot);
         }
-        if (puoli == Side.WHITE) {
-            etsiValkoisenKiinnitetytRuudut();
-        } else {
+        HashMap<String, String> kiinnitetyt = etsiKiinnitetytRuudut();
 
-        }
         String lahtoruutu = "";
         String kohderuutu = "";
         for (int i = 0; i < laillisetSiirrot.size(); i++) {
             lahtoruutu = laillisetSiirrot.get(i).substring(0, 2);
-            kohderuutu = laillisetSiirrot.get(i).substring(2);
+            kohderuutu = laillisetSiirrot.get(i).substring(2, 4);
 
-            if (kiinnitetyt.containsKey(lahtoruutu) && (kiinnitetyt.get(lahtoruutu) != kohderuutu)) {
-                System.out.println("KIINNITETTY: " + lahtoruutu);
-                System.out.println("KIINNITETTY: " + lahtoruutu);
-                System.out.println("KIINNITETTY: " + lahtoruutu);
-                System.out.println("KIINNITETTY: " + lahtoruutu);
-                System.out.println("KIINNITETTY: " + lahtoruutu);
+            if (kiinnitetyt.containsKey(lahtoruutu) && !kiinnitetyt.get(lahtoruutu).equals(kohderuutu)) {
                 System.out.println("KIINNITETTY: " + lahtoruutu);
                 laillisetSiirrot.remove(i);
                 i--;
