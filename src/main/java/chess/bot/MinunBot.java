@@ -1,7 +1,6 @@
 package chess.bot;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import chess.engine.GameState;
 import chess.model.Side;
@@ -9,14 +8,12 @@ import datastructureproject.*;
 
 public class MinunBot implements ChessBot {
     private Pelilauta lauta;
-    private Random random;
     private int syvyys;
     private Arvioija arvioija;
 
     public MinunBot() {
         this.lauta = new Pelilauta();
-        this.random = new Random();
-        this.syvyys = 3;
+        this.syvyys = 4;
         this.arvioija = new Arvioija();
     }
 
@@ -29,74 +26,79 @@ public class MinunBot implements ChessBot {
         }
         if (gamestate.getMoveCount() > 0) { // Haetaan vastustajan viimeksi tekemä siirto ennen oman siirron tekemistä
             String siirto = gamestate.getLatestMove();
-            if (siirto.length() == 4) {
-                lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2), vastustaja);
-            } else if (siirto.length() == 5) {
-                lauta.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2, 4), vastustaja,
-                        siirto.substring(4));
-            }
+            this.lauta.siirraNappulaRuutuun(siirto, vastustaja);
         }
-        ArrayList<String> siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
-
-        int parasArvio = Integer.MIN_VALUE;
-        String parasSiirto = "";
+        ArrayList<String> siirrot = new ArrayList<>();
+        siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
 
         if (siirrot.size() > 0) {
+            String parasSiirto = siirrot.get(0);
+            int parasArvio = Integer.MIN_VALUE;
             for (int i = 0; i < siirrot.size(); i++) {
                 String siirto = siirrot.get(i);
-                Pelilauta lautaKopio = new Pelilauta();
-                lautaKopio.setMustat(lauta.getMustat());
-                lautaKopio.setValkoiset(lauta.getValkoiset());
-                if (siirto.length() == 4) {
-                    lautaKopio.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2, 4), gamestate.playing);
-                } else if (siirto.length() == 5) {
-                    lautaKopio.siirraNappulaRuutuun(siirto.substring(0, 2), siirto.substring(2, 4), gamestate.playing,
-                            siirto.substring(4));
-                }
-                int arvio = minimax(lautaKopio, this.syvyys, vastustaja);
+                Pelilauta l = this.lauta.kopioiPelilauta();
+                l.siirraNappulaRuutuun(siirto, gamestate.playing);
+                int arvio = alfabeta(l, this.syvyys, vastustaja, Integer.MIN_VALUE, Integer.MAX_VALUE);
                 if (arvio > parasArvio) {
                     parasSiirto = siirto;
                     parasArvio = arvio;
                 }
             }
-            if (parasSiirto.length() == 4) {
-                lauta.siirraNappulaRuutuun(parasSiirto.substring(0, 2), parasSiirto.substring(2), gamestate.playing);
-            } else if (parasSiirto.length() == 5) {
-                lauta.siirraNappulaRuutuun(parasSiirto.substring(0, 2), parasSiirto.substring(2, 4), gamestate.playing,
-                        parasSiirto.substring(4));
-            }
+            this.lauta.siirraNappulaRuutuun(parasSiirto, gamestate.playing);
             return parasSiirto;
+
         } else {
-            System.out.println("TYHJÄ LISTA");
-            System.out.println("TYHJÄ LISTA");
-            System.out.println("TYHJÄ LISTA");
             System.out.println("TYHJÄ LISTA");
             return null;
         }
     }
 
-    public int minimax(Pelilauta lauta, int syvyys, Side puoli) {
-        ArrayList<String> siirrot = lauta.etsiLaillisetSiirrot(puoli);
+    public int alfabeta(Pelilauta pl, int syvyys, Side puoli, int alfa, int beta) {
         if (puoli == Side.WHITE) {
-            puoli = Side.BLACK;
+            if (syvyys == 0) {
+                int x = arvioija.arvioiPelilauta(pl);
+                return x;
+            }
+            ArrayList<String> siirrot = new ArrayList<>();
+            siirrot = pl.etsiLaillisetSiirrot(puoli);
+            int arvio = Integer.MIN_VALUE;
+            if (siirrot.isEmpty()) {
+                return arvio;
+            }
+            for (int i = 0; i < siirrot.size(); i++) {
+                String siirto = siirrot.get(i);
+                Pelilauta l = pl.kopioiPelilauta();
+                l.siirraNappulaRuutuun(siirto, puoli);
+                arvio = Math.max(arvio, alfabeta(l, syvyys - 1, Side.BLACK, alfa, beta));
+                alfa = Math.max(alfa, arvio);
+                if (beta <= alfa) {
+                    break;
+                }
+            }
+            return arvio;
         } else {
-            puoli = Side.WHITE;
+            if (syvyys == 0) {
+                int x = arvioija.arvioiPelilauta(pl);
+                return x;
+            }
+            ArrayList<String> siirrot = new ArrayList<>();
+            siirrot = pl.etsiLaillisetSiirrot(puoli);
+            int arvio = Integer.MAX_VALUE;
+            if (siirrot.isEmpty()) {
+                return arvio;
+            }
+            for (int i = 0; i < siirrot.size(); i++) {
+                String siirto = siirrot.get(i);
+                Pelilauta l = pl.kopioiPelilauta();
+                l.siirraNappulaRuutuun(siirto, puoli);
+                arvio = Math.min(arvio, alfabeta(l, syvyys - 1, Side.BLACK, alfa, beta));
+                beta = Math.min(beta, arvio);
+                if (beta <= alfa) {
+                    break;
+                }
+            }
+            return arvio;
         }
-
-        if (syvyys == 0) {
-            return arvioija.arvioiPelilauta(lauta);
-        }
-        int arvio = Integer.MIN_VALUE;
-
-        for (int i = 0; i < siirrot.size(); i++) {
-            Pelilauta lautaKopio = new Pelilauta();
-            lautaKopio.setMustat(lauta.getMustat());
-            lautaKopio.setValkoiset(lauta.getValkoiset());
-            lautaKopio.pelaaSiirrot(siirrot.get(i));
-            arvio = Math.max(arvio, minimax(lautaKopio, syvyys - 1, puoli));
-        }
-
-        return arvio;
     }
 
 }

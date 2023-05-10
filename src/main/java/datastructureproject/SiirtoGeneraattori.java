@@ -542,7 +542,7 @@ public class SiirtoGeneraattori {
     }
 
     private HashMap<String, String> etsiKiinnitetytRuudut() { // Eli ruudut, joista nappulaa ei voi siirtää
-                                                              // sillä kuningas
+        // sillä kuningas
         // joutuisi shakkiin
         String kuninkaanRuutu = "";
         HashMap<String, String> kiinnitetyt = new HashMap<>();
@@ -557,7 +557,7 @@ public class SiirtoGeneraattori {
             }
             omat = valkoiset;
             vastustajan = mustat;
-        } else {
+        } else if (puoli == Side.BLACK) {
             for (HashMap.Entry<String, NappulaTyyppi> set : mustat.entrySet()) {
                 if (set.getValue() == NappulaTyyppi.KUNINGAS) {
                     kuninkaanRuutu = set.getKey();
@@ -1039,7 +1039,6 @@ public class SiirtoGeneraattori {
         ArrayList<String> laillisetSiirrot = new ArrayList<>();
         laillisetSiirrot = poistaKuninkaanLaittomat(siirrot);
         if (onkoShakissa(puoli)) {
-            System.out.println("SHAKISSA");
             return poistaShakki(laillisetSiirrot);
         }
         HashMap<String, String> kiinnitetyt = etsiKiinnitetytRuudut();
@@ -1051,7 +1050,6 @@ public class SiirtoGeneraattori {
             kohderuutu = laillisetSiirrot.get(i).substring(2, 4);
 
             if (kiinnitetyt.containsKey(lahtoruutu) && !kiinnitetyt.get(lahtoruutu).equals(kohderuutu)) {
-                System.out.println("KIINNITETTY: " + lahtoruutu);
                 laillisetSiirrot.remove(i);
                 i--;
             }
