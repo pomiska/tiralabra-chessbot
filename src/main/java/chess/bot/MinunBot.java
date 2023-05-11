@@ -1,6 +1,8 @@
 package chess.bot;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import chess.engine.GameState;
 import chess.model.Side;
@@ -8,12 +10,11 @@ import datastructureproject.*;
 
 public class MinunBot implements ChessBot {
     private Pelilauta lauta;
-    private int syvyys;
+    private final int syvyys = 3;
     private Arvioija arvioija;
 
     public MinunBot() {
         this.lauta = new Pelilauta();
-        this.syvyys = 4;
         this.arvioija = new Arvioija();
     }
 
@@ -26,25 +27,26 @@ public class MinunBot implements ChessBot {
         }
         if (gamestate.getMoveCount() > 0) { // Haetaan vastustajan viimeksi tekemä siirto ennen oman siirron tekemistä
             String siirto = gamestate.getLatestMove();
-            this.lauta.siirraNappulaRuutuun(siirto, vastustaja);
+            this.lauta.teeSiirto(siirto, vastustaja);
         }
-        ArrayList<String> siirrot = new ArrayList<>();
-        siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
+        ArrayList<String> siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
+        ArrayList<String> jsiirrot = jarjestaSiirrot(lauta, siirrot, gamestate.playing);
 
         if (siirrot.size() > 0) {
-            String parasSiirto = siirrot.get(0);
+            String parasSiirto = jsiirrot.get(0);
             int parasArvio = Integer.MIN_VALUE;
-            for (int i = 0; i < siirrot.size(); i++) {
-                String siirto = siirrot.get(i);
-                Pelilauta l = this.lauta.kopioiPelilauta();
-                l.siirraNappulaRuutuun(siirto, gamestate.playing);
-                int arvio = alfabeta(l, this.syvyys, vastustaja, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            for (int i = 0; i < jsiirrot.size(); i++) {
+                String siirto = jsiirrot.get(i);
+                Pelilauta pl = lauta.kopioiPelilauta();
+                pl.teeSiirto(siirto, gamestate.playing);
+                int arvio = alfabeta(pl, this.syvyys, vastustaja, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                pl = null;
                 if (arvio > parasArvio) {
                     parasSiirto = siirto;
                     parasArvio = arvio;
                 }
             }
-            this.lauta.siirraNappulaRuutuun(parasSiirto, gamestate.playing);
+            this.lauta.teeSiirto(parasSiirto, gamestate.playing);
             return parasSiirto;
 
         } else {
@@ -53,52 +55,86 @@ public class MinunBot implements ChessBot {
         }
     }
 
-    public int alfabeta(Pelilauta pl, int syvyys, Side puoli, int alfa, int beta) {
+    public int alfabeta(Pelilauta l, int syvyys, Side puoli, int alfa, int beta) {
         if (puoli == Side.WHITE) {
             if (syvyys == 0) {
-                int x = arvioija.arvioiPelilauta(pl);
+                int x = arvioija.arvioiPelilauta(l);
                 return x;
             }
-            ArrayList<String> siirrot = new ArrayList<>();
-            siirrot = pl.etsiLaillisetSiirrot(puoli);
+            ArrayList<String> siirrot = l.etsiLaillisetSiirrot(puoli);
             int arvio = Integer.MIN_VALUE;
             if (siirrot.isEmpty()) {
                 return arvio;
             }
             for (int i = 0; i < siirrot.size(); i++) {
                 String siirto = siirrot.get(i);
-                Pelilauta l = pl.kopioiPelilauta();
-                l.siirraNappulaRuutuun(siirto, puoli);
-                arvio = Math.max(arvio, alfabeta(l, syvyys - 1, Side.BLACK, alfa, beta));
+                Pelilauta pl = l.kopioiPelilauta();
+                pl.teeSiirto(siirto, puoli);
+                arvio = Math.max(arvio, alfabeta(pl, syvyys - 1, Side.BLACK, alfa, beta));
+                pl = null;
                 alfa = Math.max(alfa, arvio);
-                if (beta <= alfa) {
+                if (arvio >= beta) {
                     break;
                 }
             }
             return arvio;
         } else {
             if (syvyys == 0) {
-                int x = arvioija.arvioiPelilauta(pl);
+                int x = arvioija.arvioiPelilauta(l);
                 return x;
             }
-            ArrayList<String> siirrot = new ArrayList<>();
-            siirrot = pl.etsiLaillisetSiirrot(puoli);
+            ArrayList<String> siirrot = l.etsiLaillisetSiirrot(puoli);
             int arvio = Integer.MAX_VALUE;
             if (siirrot.isEmpty()) {
                 return arvio;
             }
             for (int i = 0; i < siirrot.size(); i++) {
                 String siirto = siirrot.get(i);
-                Pelilauta l = pl.kopioiPelilauta();
-                l.siirraNappulaRuutuun(siirto, puoli);
-                arvio = Math.min(arvio, alfabeta(l, syvyys - 1, Side.BLACK, alfa, beta));
+                Pelilauta pl = l.kopioiPelilauta();
+                pl.teeSiirto(siirto, puoli);
+                arvio = Math.min(arvio, alfabeta(pl, syvyys - 1, Side.BLACK, alfa, beta));
+                pl = null;
                 beta = Math.min(beta, arvio);
-                if (beta <= alfa) {
+                if (arvio <= alfa) {
                     break;
                 }
             }
             return arvio;
         }
+    }
+
+    private ArrayList<String> jarjestaSiirrot(Pelilauta l, ArrayList<String> siirrot, Side vuoro) {
+        ArrayList<Integer> arvotJ = new ArrayList<>();
+        HashMap<String, Integer> arvot = new HashMap<>();
+        ArrayList<String> jarjestetyt = new ArrayList<>();
+        Side vastustaja = null;
+        if (vuoro == Side.WHITE) {
+            vastustaja = Side.BLACK;
+        } else {
+            vastustaja = Side.WHITE;
+        }
+        for (int i = 0; i < siirrot.size(); i++) {
+            String siirto = siirrot.get(i);
+            Pelilauta pl = l.kopioiPelilauta();
+            pl.teeSiirto(siirto, vuoro);
+            int arvio = alfabeta(pl, syvyys - 1, vastustaja, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            pl = null;
+            arvot.put(siirto, arvio);
+        }
+        for (HashMap.Entry<String, Integer> entry : arvot.entrySet()) {
+            arvotJ.add(entry.getValue());
+        }
+        Collections.sort(arvotJ);
+        Collections.reverse(arvotJ);
+
+        for (int arvo : arvotJ) {
+            for (HashMap.Entry<String, Integer> entry : arvot.entrySet()) {
+                if (entry.getValue().equals(arvo)) {
+                    jarjestetyt.add(entry.getKey());
+                }
+            }
+        }
+        return jarjestetyt;
     }
 
 }

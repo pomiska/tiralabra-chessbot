@@ -567,6 +567,7 @@ public class SiirtoGeneraattori {
             omat = mustat;
             vastustajan = valkoiset;
         }
+
         int rivi = Character.getNumericValue(kuninkaanRuutu.charAt(1));
         String linja = String.valueOf(kuninkaanRuutu.charAt(0));
         String kiinnitettyRuutu = "";
