@@ -10,7 +10,7 @@ import datastructureproject.*;
 
 public class MinunBot implements ChessBot {
     private Pelilauta lauta;
-    private final int syvyys = 5;
+    private final int syvyys = 4;
     private Arvioija arvioija;
 
     public MinunBot() {

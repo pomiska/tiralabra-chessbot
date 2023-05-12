@@ -197,15 +197,97 @@ public class Pelilauta {
         }
     }
 
+    private boolean voikoValkoinenTornittaaVasemmalle(ArrayList<String> siirrot) {
+        if (!valkoisenVasemmalleTornitus) {
+            return false;
+        }
+        for (int i = 0; i < siirrot.size(); i++) {
+            String kohde = siirrot.get(i).substring(2, 4);
+            if (kohde.equals("e1") || kohde.equals("d1") || kohde.equals("c1")) {
+                return false;
+            }
+            if (valkoiset[1][0] != ' ' || valkoiset[2][0] != ' ' || valkoiset[3][0] != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean voikoValkoinenTornittaaOikealle(ArrayList<String> siirrot) {
+        if (!valkoisenOikealleTornitus) {
+            return false;
+        }
+        for (int i = 0; i < siirrot.size(); i++) {
+            String kohde = siirrot.get(i).substring(2, 4);
+            if (kohde.equals("e1") || kohde.equals("f1") || kohde.equals("g1")) {
+                return false;
+            }
+            if (valkoiset[5][0] != ' ' || valkoiset[6][0] != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean voikoMustaTornittaaVasemmalle(ArrayList<String> siirrot) {
+        if (!mustanVasemmalleTornitus) {
+            return false;
+        }
+        for (int i = 0; i < siirrot.size(); i++) {
+            String kohde = siirrot.get(i).substring(2, 4);
+            if (kohde.equals("e8") || kohde.equals("d8") || kohde.equals("c8")) {
+                return false;
+            }
+            if (mustat[1][7] != ' ' || mustat[2][7] != ' ' || mustat[3][7] != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean voikoMustaTornittaaOikealle(ArrayList<String> siirrot) {
+        if (!mustanOikealleTornitus) {
+            return false;
+        }
+        for (int i = 0; i < siirrot.size(); i++) {
+            String kohde = siirrot.get(i).substring(2, 4);
+            if (kohde.equals("e8") || kohde.equals("f8") || kohde.equals("g8")) {
+                return false;
+            }
+            if (mustat[5][0] != ' ' || mustat[6][0] != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public ArrayList<String> etsiLaillisetSiirrot(Side puoli) {
         SiirtoGeneraattori sg = new SiirtoGeneraattori(valkoiset, mustat, puoli);
-        ArrayList<String> siirrot = new ArrayList<>();
+        ArrayList<String> omatSiirrot = new ArrayList<>();
+        ArrayList<String> vastustajanSiirrot = new ArrayList<>();
         if (puoli == Side.WHITE) {
-            siirrot = sg.valkoisenSiirrot();
+            omatSiirrot = sg.poistaLaittomatSiirrot(sg.valkoisenSiirrot());
+            vastustajanSiirrot = sg.mustanSiirrot();
         } else {
-            siirrot = sg.mustanSiirrot();
+            omatSiirrot = sg.poistaLaittomatSiirrot(sg.mustanSiirrot());
+            vastustajanSiirrot = sg.valkoisenSiirrot();
         }
-        return sg.poistaLaittomatSiirrot(siirrot);
+        if (puoli == Side.WHITE) {
+            if (voikoValkoinenTornittaaVasemmalle(vastustajanSiirrot)) {
+                omatSiirrot.add("e1c1");
+            }
+            if (voikoValkoinenTornittaaOikealle(vastustajanSiirrot)) {
+                omatSiirrot.add("e1g1");
+            }
+        } else {
+            if (voikoMustaTornittaaVasemmalle(vastustajanSiirrot)) {
+                omatSiirrot.add("e8c8");
+            }
+            if (voikoMustaTornittaaOikealle(vastustajanSiirrot)) {
+                omatSiirrot.add("e8g8");
+            }
+        }
+        return omatSiirrot;
     }
 
     public char getNappulaRuudusta(String ruutu) { // Yksikkötestejä varten getteri
