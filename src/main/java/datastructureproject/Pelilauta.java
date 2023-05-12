@@ -1,124 +1,130 @@
 package datastructureproject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 
 import chess.model.Side;
 
 public class Pelilauta {
-
-    private HashMap<String, NappulaTyyppi> valkoiset; // Tallennetaan kummankin puolen nappuloista tieto tyylillä
-    // <Ruutu, NappulaTyyppi>
-    private HashMap<String, NappulaTyyppi> mustat;
+    private char[][] valkoiset; // tallennetaan tieto nappuloista tyylillä [linjan indeksi][rivin indeksi] =
+                                // nappulan tyyppi
+    private char[][] mustat;
+    private ArrayList<Character> linjat;
     private ArrayList<String> tehdytSiirrot;
     private Boolean valkoisenOikealleTornitus; // pidetään kirjaa voiko tornittaa
     private Boolean valkoisenVasemmalleTornitus;
     private Boolean mustanOikealleTornitus;
     private Boolean mustanVasemmalleTornitus;
-    private NappulaTyyppi poistettuNappula;
+    private char poistettuNappula;
     private Boolean poistettu;
 
     public Pelilauta() {
-        this.valkoiset = new HashMap<>();
-        this.mustat = new HashMap<>();
+        this.valkoiset = new char[8][8];
+        this.mustat = new char[8][8];
         this.tehdytSiirrot = new ArrayList<>();
         this.valkoisenOikealleTornitus = true;
         this.valkoisenVasemmalleTornitus = true;
         this.mustanOikealleTornitus = true;
         this.mustanVasemmalleTornitus = true;
 
+        this.linjat = new ArrayList<>();
+        this.linjat.add('a');
+        this.linjat.add('b');
+        this.linjat.add('c');
+        this.linjat.add('d');
+        this.linjat.add('e');
+        this.linjat.add('f');
+        this.linjat.add('g');
+        this.linjat.add('h');
+
         this.uusiLauta();
     }
 
     private void uusiLauta() {
-        valkoiset.put("a1", NappulaTyyppi.TORNI);
-        valkoiset.put("b1", NappulaTyyppi.RATSU);
-        valkoiset.put("c1", NappulaTyyppi.LAHETTI);
-        valkoiset.put("d1", NappulaTyyppi.KUNINGATAR);
-        valkoiset.put("e1", NappulaTyyppi.KUNINGAS);
-        valkoiset.put("f1", NappulaTyyppi.LAHETTI);
-        valkoiset.put("g1", NappulaTyyppi.RATSU);
-        valkoiset.put("h1", NappulaTyyppi.TORNI);
-        valkoiset.put("a2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("b2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("c2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("d2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("e2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("f2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("g2", NappulaTyyppi.SOTILAS);
-        valkoiset.put("h2", NappulaTyyppi.SOTILAS);
+        for (int i = 0; i < valkoiset.length; i++) {
+            Arrays.fill(valkoiset[i], ' ');
+            Arrays.fill(mustat[i], ' ');
+        }
 
-        mustat.put("a8", NappulaTyyppi.TORNI);
-        mustat.put("b8", NappulaTyyppi.RATSU);
-        mustat.put("c8", NappulaTyyppi.LAHETTI);
-        mustat.put("d8", NappulaTyyppi.KUNINGATAR);
-        mustat.put("e8", NappulaTyyppi.KUNINGAS);
-        mustat.put("f8", NappulaTyyppi.LAHETTI);
-        mustat.put("g8", NappulaTyyppi.RATSU);
-        mustat.put("h8", NappulaTyyppi.TORNI);
-        mustat.put("a7", NappulaTyyppi.SOTILAS);
-        mustat.put("b7", NappulaTyyppi.SOTILAS);
-        mustat.put("c7", NappulaTyyppi.SOTILAS);
-        mustat.put("d7", NappulaTyyppi.SOTILAS);
-        mustat.put("e7", NappulaTyyppi.SOTILAS);
-        mustat.put("f7", NappulaTyyppi.SOTILAS);
-        mustat.put("g7", NappulaTyyppi.SOTILAS);
-        mustat.put("h7", NappulaTyyppi.SOTILAS);
+        valkoiset[0][0] = 'r';
+        valkoiset[1][0] = 'n';
+        valkoiset[2][0] = 'b';
+        valkoiset[3][0] = 'q';
+        valkoiset[4][0] = 'k';
+        valkoiset[5][0] = 'b';
+        valkoiset[6][0] = 'n';
+        valkoiset[7][0] = 'r';
+        valkoiset[0][1] = 'p';
+        valkoiset[1][1] = 'p';
+        valkoiset[2][1] = 'p';
+        valkoiset[3][1] = 'p';
+        valkoiset[4][1] = 'p';
+        valkoiset[5][1] = 'p';
+        valkoiset[6][1] = 'p';
+        valkoiset[7][1] = 'p';
+
+        mustat[0][7] = 'r';
+        mustat[1][7] = 'n';
+        mustat[2][7] = 'b';
+        mustat[3][7] = 'q';
+        mustat[4][7] = 'k';
+        mustat[5][7] = 'b';
+        mustat[6][7] = 'n';
+        mustat[7][7] = 'r';
+        mustat[0][6] = 'p';
+        mustat[1][6] = 'p';
+        mustat[2][6] = 'p';
+        mustat[3][6] = 'p';
+        mustat[4][6] = 'p';
+        mustat[5][6] = 'p';
+        mustat[6][6] = 'p';
+        mustat[7][6] = 'p';
     }
 
     public void teeSiirto(String siirto, Side puoli) {
-        String lahtoRuutu = siirto.substring(0, 2);
-        String kohdeRuutu = siirto.substring(2, 4);
+        String lahtoruutu = siirto.substring(0, 2);
+        String kohderuutu = siirto.substring(2, 4);
         if (siirto.length() > 4) {
-            String korotus = siirto.substring(4);
-            NappulaTyyppi k = null;
-            if (korotus.equals("q")) {
-                k = NappulaTyyppi.KUNINGATAR;
-            } else if (korotus.equals("r")) {
-                k = NappulaTyyppi.TORNI;
-            } else if (korotus.equals("n")) {
-                k = NappulaTyyppi.RATSU;
-            } else if (korotus.equals("b")) {
-                k = NappulaTyyppi.LAHETTI;
-            }
-            asetaNappulaRuutuun(kohdeRuutu, puoli, k);
-            poistaNappulaRuudusta(lahtoRuutu, puoli);
+            char korotus = siirto.charAt(4);
+            asetaNappulaRuutuun(kohderuutu, puoli, korotus);
+            poistaNappulaRuudusta(lahtoruutu, puoli);
+            tehdytSiirrot.add(siirto);
             return;
         }
-        if (puoli == Side.WHITE) {
-            asetaNappulaRuutuun(kohdeRuutu, puoli, valkoiset.get(lahtoRuutu));
-        } else {
-            asetaNappulaRuutuun(kohdeRuutu, puoli, mustat.get(lahtoRuutu));
-        }
-        poistaNappulaRuudusta(lahtoRuutu, puoli);
+        asetaNappulaRuutuun(kohderuutu, puoli, getNappulaRuudusta(lahtoruutu));
+        poistaNappulaRuudusta(lahtoruutu, puoli);
         tehdytSiirrot.add(siirto);
-        paivitaTornitus(lahtoRuutu, kohdeRuutu);
+        paivitaTornitus(lahtoruutu, kohderuutu);
     }
 
-    private void asetaNappulaRuutuun(String ruutu, Side puoli, NappulaTyyppi tyyppi) {
+    private void asetaNappulaRuutuun(String ruutu, Side puoli, char nappula) {
         poistettu = false;
+        int linjaI = linjat.indexOf(ruutu.charAt(0));
+        int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
         if (puoli == Side.WHITE) {
-            valkoiset.put(ruutu, tyyppi);
-            if (mustat.containsKey(ruutu)) { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
-                poistettuNappula = mustat.get(ruutu);
+            valkoiset[linjaI][rivi] = nappula;
+            if (mustat[linjaI][rivi] != ' ') { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
+                poistettuNappula = mustat[linjaI][rivi];
                 poistettu = true;
-                mustat.remove(ruutu);
+                mustat[linjaI][rivi] = ' ';
             }
         } else if (puoli == Side.BLACK) {
-            mustat.put(ruutu, tyyppi);
-            if (valkoiset.containsKey(ruutu)) {
-                poistettuNappula = valkoiset.get(ruutu);
+            mustat[linjaI][rivi] = nappula;
+            if (valkoiset[linjaI][rivi] != ' ') { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
+                poistettuNappula = valkoiset[linjaI][rivi];
                 poistettu = true;
-                valkoiset.remove(ruutu);
+                valkoiset[linjaI][rivi] = ' ';
             }
         }
     }
 
     private void poistaNappulaRuudusta(String ruutu, Side puoli) {
+        int linjaI = linjat.indexOf(ruutu.charAt(0));
+        int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
         if (puoli == Side.WHITE) {
-            valkoiset.remove(ruutu);
-        } else if (puoli == Side.BLACK) {
-            mustat.remove(ruutu);
+            valkoiset[linjaI][rivi] = ' ';
+        } else {
+            mustat[linjaI][rivi] = ' ';
         }
     }
 
@@ -130,58 +136,63 @@ public class Pelilauta {
             p = Side.BLACK;
         }
         String s = tehdytSiirrot.get(tehdytSiirrot.size() - 1);
+        tehdytSiirrot.remove(tehdytSiirrot.size() - 1);
         String lahto = s.substring(0, 2);
         String kohde = s.substring(2, 4);
+        int lahtoLinjaI = linjat.indexOf(lahto.charAt(0));
+        int lahtoRivi = Character.getNumericValue(lahto.charAt(1)) - 1;
+        int kohdeLinjaI = linjat.indexOf(kohde.charAt(0));
+        int kohdeRivi = Character.getNumericValue(kohde.charAt(1)) - 1;
         if (s.length() == 5) {
             if (p == Side.WHITE) {
-                valkoiset.put(lahto, NappulaTyyppi.SOTILAS);
+                valkoiset[lahtoLinjaI][lahtoRivi] = 'p';
                 if (poistettu) {
-                    mustat.put(kohde, poistettuNappula);
+                    mustat[kohdeLinjaI][kohdeRivi] = poistettuNappula;
                 }
-                valkoiset.remove(kohde);
+                valkoiset[kohdeLinjaI][kohdeRivi] = ' ';
             } else {
-                mustat.put(lahto, NappulaTyyppi.SOTILAS);
+                mustat[lahtoLinjaI][lahtoRivi] = 'p';
                 if (poistettu) {
-                    valkoiset.put(kohde, poistettuNappula);
+                    valkoiset[kohdeLinjaI][kohdeRivi] = poistettuNappula;
                 }
-                mustat.remove(kohde);
+                mustat[kohdeLinjaI][kohdeRivi] = ' ';
             }
         } else {
             if (p == Side.WHITE) {
-                valkoiset.put(lahto, valkoiset.get(kohde));
+                valkoiset[lahtoLinjaI][lahtoRivi] = valkoiset[kohdeLinjaI][kohdeRivi];
                 if (poistettu) {
-                    mustat.put(kohde, poistettuNappula);
+                    mustat[kohdeLinjaI][kohdeRivi] = poistettuNappula;
                 }
-                valkoiset.remove(kohde);
+                valkoiset[kohdeLinjaI][kohdeRivi] = ' ';
             } else {
-                mustat.put(lahto, mustat.get(kohde));
+                mustat[lahtoLinjaI][lahtoRivi] = valkoiset[kohdeLinjaI][kohdeRivi];
                 if (poistettu) {
-                    valkoiset.put(kohde, poistettuNappula);
+                    valkoiset[kohdeLinjaI][kohdeRivi] = poistettuNappula;
                 }
-                mustat.remove(kohde);
+                mustat[kohdeLinjaI][kohdeRivi] = ' ';
             }
         }
     }
 
-    private void paivitaTornitus(String lahtoRuutu, String kohdeRuutu) {
-        if (lahtoRuutu.equals("e1")) {
+    private void paivitaTornitus(String lahtoruutu, String kohderuutu) {
+        if (lahtoruutu.equals("e1")) {
             this.valkoisenOikealleTornitus = false;
             this.valkoisenVasemmalleTornitus = false;
         }
-        if (lahtoRuutu.equals("a1") || kohdeRuutu.equals("a1")) {
+        if (lahtoruutu.equals("a1") || kohderuutu.equals("a1")) {
             this.valkoisenVasemmalleTornitus = false;
         }
-        if (lahtoRuutu.equals("h1") || kohdeRuutu.equals("h1")) {
+        if (lahtoruutu.equals("h1") || kohderuutu.equals("h1")) {
             this.valkoisenOikealleTornitus = false;
         }
-        if (lahtoRuutu.equals("e8")) {
+        if (lahtoruutu.equals("e8")) {
             this.mustanOikealleTornitus = false;
             this.mustanVasemmalleTornitus = false;
         }
-        if (lahtoRuutu.equals("a8") || kohdeRuutu.equals("a8")) {
+        if (lahtoruutu.equals("a8") || kohderuutu.equals("a8")) {
             this.mustanVasemmalleTornitus = false;
         }
-        if (lahtoRuutu.equals("h8") || kohdeRuutu.equals("h8")) {
+        if (lahtoruutu.equals("h8") || kohderuutu.equals("h8")) {
             this.mustanOikealleTornitus = false;
         }
     }
@@ -197,21 +208,23 @@ public class Pelilauta {
         return sg.poistaLaittomatSiirrot(siirrot);
     }
 
-    public NappulaTyyppi getNappulaRuudusta(String ruutu) { // Yksikkötestejä varten getteri
-        if (valkoiset.containsKey(ruutu)) {
-            return valkoiset.get(ruutu);
+    public char getNappulaRuudusta(String ruutu) { // Yksikkötestejä varten getteri
+        int linjaI = linjat.indexOf(ruutu.charAt(0));
+        int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
+        if (valkoiset[linjaI][rivi] != ' ') {
+            return valkoiset[linjaI][rivi];
         }
-        if (mustat.containsKey(ruutu)) {
-            return mustat.get(ruutu);
+        if (mustat[linjaI][rivi] != ' ') {
+            return mustat[linjaI][rivi];
         }
-        return null;
+        return ' ';
     }
 
-    public HashMap<String, NappulaTyyppi> getValkoiset() { // Yksikkötestejä varten
+    public char[][] getValkoiset() { // Yksikkötestejä varten
         return valkoiset;
     }
 
-    public HashMap<String, NappulaTyyppi> getMustat() { // Yksikkötestejä varten
+    public char[][] getMustat() { // Yksikkötestejä varten
         return mustat;
     }
 
@@ -242,22 +255,20 @@ public class Pelilauta {
         }
     }
 
-    public void setValkoiset(HashMap<String, NappulaTyyppi> v) {
-        valkoiset.clear();
-        for (HashMap.Entry<String, NappulaTyyppi> set : v.entrySet()) {
-            String ruutu = set.getKey();
-            NappulaTyyppi n = set.getValue();
-            valkoiset.put(ruutu, n);
+    public void setValkoiset(char[][] v) {
+        for (int i = 0; i < valkoiset.length; i++) {
+            Arrays.fill(valkoiset[i], ' ');
         }
+
+        valkoiset = Arrays.stream(v).map(char[]::clone).toArray(char[][]::new);
     }
 
-    public void setMustat(HashMap<String, NappulaTyyppi> m) {
-        mustat.clear();
-        for (HashMap.Entry<String, NappulaTyyppi> set : m.entrySet()) {
-            String ruutu = set.getKey();
-            NappulaTyyppi n = set.getValue();
-            mustat.put(ruutu, n);
+    public void setMustat(char[][] m) {
+        for (int i = 0; i < mustat.length; i++) {
+            Arrays.fill(mustat[i], ' ');
         }
+
+        mustat = Arrays.stream(m).map(char[]::clone).toArray(char[][]::new);
     }
 
     public Pelilauta kopioiPelilauta() {

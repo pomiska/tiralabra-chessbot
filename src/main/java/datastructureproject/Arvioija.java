@@ -9,28 +9,28 @@ import chess.model.Side;
 
 public class Arvioija {
 
-    private static final HashMap<NappulaTyyppi, Integer> PISTEYTYS;
+    private static final HashMap<Character, Integer> PISTEYTYS;
     static {
         PISTEYTYS = new HashMap<>();
-        PISTEYTYS.put(NappulaTyyppi.SOTILAS, 100);
-        PISTEYTYS.put(NappulaTyyppi.TORNI, 500);
-        PISTEYTYS.put(NappulaTyyppi.KUNINGATAR, 900);
-        PISTEYTYS.put(NappulaTyyppi.RATSU, 320);
-        PISTEYTYS.put(NappulaTyyppi.LAHETTI, 330);
-        PISTEYTYS.put(NappulaTyyppi.KUNINGAS, 5000);
+        PISTEYTYS.put('p', 100);
+        PISTEYTYS.put('r', 500);
+        PISTEYTYS.put('q', 900);
+        PISTEYTYS.put('n', 320);
+        PISTEYTYS.put('b', 330);
+        PISTEYTYS.put('k', 5000);
     }
 
-    private static final ArrayList<String> LINJAT;
+    private static final ArrayList<Character> LINJAT;
     static {
         LINJAT = new ArrayList<>(); // Helpottaa pisteytyksen toteuttamista
-        LINJAT.add("a");
-        LINJAT.add("b");
-        LINJAT.add("c");
-        LINJAT.add("d");
-        LINJAT.add("e");
-        LINJAT.add("f");
-        LINJAT.add("g");
-        LINJAT.add("h");
+        LINJAT.add('a');
+        LINJAT.add('b');
+        LINJAT.add('c');
+        LINJAT.add('d');
+        LINJAT.add('e');
+        LINJAT.add('f');
+        LINJAT.add('g');
+        LINJAT.add('h');
     }
 
     private static final int[][] V_SOTILAAN_RUUDUT = {
@@ -190,40 +190,37 @@ public class Arvioija {
     public Arvioija() {
     }
 
-    private int arvioiSijaintienMukaan(String ruutu, NappulaTyyppi nappula, Side puoli) {
-        int linjaI = LINJAT.indexOf(ruutu.substring(0, 1));
-        int riviI = Integer.valueOf(ruutu.substring(1, 2)) - 1;
-
+    private int arvioiSijaintienMukaan(int linjaI, int riviI, char nappula, Side puoli) {
         if (puoli == Side.WHITE) {
             switch (nappula) {
-                case SOTILAS:
+                case 'p':
                     return V_SOTILAAN_RUUDUT[linjaI][riviI];
-                case RATSU:
+                case 'n':
                     return V_RATSUN_RUUDUT[linjaI][riviI];
-                case LAHETTI:
+                case 'b':
                     return V_LAHETIN_RUUDUT[linjaI][riviI];
-                case TORNI:
+                case 'r':
                     return V_TORNIN_RUUDUT[linjaI][riviI];
-                case KUNINGATAR:
+                case 'q':
                     return V_KUNINGATTAREN_RUUDUT[linjaI][riviI];
-                case KUNINGAS:
+                case 'k':
                     return V_KUNINKAAN_RUUDUT[linjaI][riviI];
                 default:
                     return 0;
             }
         } else {
             switch (nappula) {
-                case SOTILAS:
+                case 'p':
                     return M_SOTILAAN_RUUDUT[linjaI][riviI];
-                case RATSU:
+                case 'n':
                     return M_RATSUN_RUUDUT[linjaI][riviI];
-                case LAHETTI:
+                case 'b':
                     return M_LAHETIN_RUUDUT[linjaI][riviI];
-                case TORNI:
+                case 'r':
                     return M_TORNIN_RUUDUT[linjaI][riviI];
-                case KUNINGATAR:
+                case 'q':
                     return M_KUNINGATTAREN_RUUDUT[linjaI][riviI];
-                case KUNINGAS:
+                case 'k':
                     return M_KUNINKAAN_RUUDUT[linjaI][riviI];
                 default:
                     return 0;
@@ -232,23 +229,25 @@ public class Arvioija {
     }
 
     public int arvioiPelilauta(Pelilauta lauta) { // Toistaiseksi vain valkoiselle toimii
-        HashMap<String, NappulaTyyppi> valkoiset = lauta.getValkoiset();
-        HashMap<String, NappulaTyyppi> mustat = lauta.getMustat();
+        char[][] valkoiset = lauta.getValkoiset();
+        char[][] mustat = lauta.getMustat();
         int pisteet = 0;
-        for (HashMap.Entry<String, NappulaTyyppi> set : valkoiset.entrySet()) {
-            if (set.getValue() == null) {
-                continue;
+        for (int i = 0; i < valkoiset.length; i++) {
+            for (int j = 0; j < valkoiset[i].length; j++) {
+                if (valkoiset[i][j] != ' ') {
+                    pisteet += PISTEYTYS.get(valkoiset[i][j]);
+                    pisteet += arvioiSijaintienMukaan(i, j, valkoiset[i][j], Side.WHITE);
+                }
             }
-            pisteet += PISTEYTYS.get(set.getValue());
-            pisteet += arvioiSijaintienMukaan(set.getKey(), set.getValue(), Side.WHITE);
         }
 
-        for (HashMap.Entry<String, NappulaTyyppi> set : mustat.entrySet()) {
-            if (set.getValue() == null) {
-                continue;
+        for (int i = 0; i < mustat.length; i++) {
+            for (int j = 0; j < mustat[i].length; j++) {
+                if (mustat[i][j] != ' ') {
+                    pisteet -= PISTEYTYS.get(mustat[i][j]);
+                    pisteet -= arvioiSijaintienMukaan(i, j, mustat[i][j], Side.BLACK);
+                }
             }
-            pisteet -= PISTEYTYS.get(set.getValue());
-            pisteet -= arvioiSijaintienMukaan(set.getKey(), set.getValue(), Side.BLACK);
         }
 
         return pisteet;

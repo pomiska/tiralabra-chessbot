@@ -10,7 +10,7 @@ import datastructureproject.*;
 
 public class MinunBot implements ChessBot {
     private Pelilauta lauta;
-    private final int syvyys = 3;
+    private final int syvyys = 5;
     private Arvioija arvioija;
 
     public MinunBot() {
@@ -30,17 +30,19 @@ public class MinunBot implements ChessBot {
             this.lauta.teeSiirto(siirto, vastustaja);
         }
         ArrayList<String> siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
-        ArrayList<String> jsiirrot = jarjestaSiirrot(lauta, siirrot, gamestate.playing);
-
+        // ArrayList<String> jsiirrot = jarjestaSiirrot(lauta, siirrot,
+        // gamestate.playing, this.syvyys - 1);
+        //
         if (siirrot.size() > 0) {
-            String parasSiirto = jsiirrot.get(0);
+            String parasSiirto = siirrot.get(0);
             int parasArvio = Integer.MIN_VALUE;
-            for (int i = 0; i < jsiirrot.size(); i++) {
-                String siirto = jsiirrot.get(i);
-                Pelilauta pl = lauta.kopioiPelilauta();
-                pl.teeSiirto(siirto, gamestate.playing);
-                int arvio = alfabeta(pl, this.syvyys, vastustaja, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                pl = null;
+            for (int i = 0; i < siirrot.size(); i++) {
+                String siirto = siirrot.get(i);
+                Pelilauta l = lauta.kopioiPelilauta();
+                l.teeSiirto(siirto, gamestate.playing);
+                int arvio = alfabeta(l, this.syvyys, vastustaja, Integer.MIN_VALUE,
+                        Integer.MAX_VALUE);
+                l = null;
                 if (arvio > parasArvio) {
                     parasSiirto = siirto;
                     parasArvio = arvio;
@@ -58,8 +60,7 @@ public class MinunBot implements ChessBot {
     public int alfabeta(Pelilauta l, int syvyys, Side puoli, int alfa, int beta) {
         if (puoli == Side.WHITE) {
             if (syvyys == 0) {
-                int x = arvioija.arvioiPelilauta(l);
-                return x;
+                return arvioija.arvioiPelilauta(l);
             }
             ArrayList<String> siirrot = l.etsiLaillisetSiirrot(puoli);
             int arvio = Integer.MIN_VALUE;
@@ -80,8 +81,7 @@ public class MinunBot implements ChessBot {
             return arvio;
         } else {
             if (syvyys == 0) {
-                int x = arvioija.arvioiPelilauta(l);
-                return x;
+                return arvioija.arvioiPelilauta(l);
             }
             ArrayList<String> siirrot = l.etsiLaillisetSiirrot(puoli);
             int arvio = Integer.MAX_VALUE;
@@ -92,7 +92,7 @@ public class MinunBot implements ChessBot {
                 String siirto = siirrot.get(i);
                 Pelilauta pl = l.kopioiPelilauta();
                 pl.teeSiirto(siirto, puoli);
-                arvio = Math.min(arvio, alfabeta(pl, syvyys - 1, Side.BLACK, alfa, beta));
+                arvio = Math.min(arvio, alfabeta(pl, syvyys - 1, Side.WHITE, alfa, beta));
                 pl = null;
                 beta = Math.min(beta, arvio);
                 if (arvio <= alfa) {
@@ -103,7 +103,7 @@ public class MinunBot implements ChessBot {
         }
     }
 
-    private ArrayList<String> jarjestaSiirrot(Pelilauta l, ArrayList<String> siirrot, Side vuoro) {
+    private ArrayList<String> jarjestaSiirrot(Pelilauta l, ArrayList<String> siirrot, Side vuoro, int syvyys) {
         ArrayList<Integer> arvotJ = new ArrayList<>();
         HashMap<String, Integer> arvot = new HashMap<>();
         ArrayList<String> jarjestetyt = new ArrayList<>();
@@ -117,7 +117,8 @@ public class MinunBot implements ChessBot {
             String siirto = siirrot.get(i);
             Pelilauta pl = l.kopioiPelilauta();
             pl.teeSiirto(siirto, vuoro);
-            int arvio = alfabeta(pl, syvyys - 1, vastustaja, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            int arvio = alfabeta(pl, syvyys, vastustaja, Integer.MIN_VALUE,
+                    Integer.MAX_VALUE);
             pl = null;
             arvot.put(siirto, arvio);
         }
