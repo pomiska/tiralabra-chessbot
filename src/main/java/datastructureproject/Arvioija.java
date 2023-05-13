@@ -17,7 +17,7 @@ public class Arvioija {
         PISTEYTYS.put('q', 900);
         PISTEYTYS.put('n', 320);
         PISTEYTYS.put('b', 330);
-        PISTEYTYS.put('k', 5000);
+        PISTEYTYS.put('k', 20000);
     }
 
     private static final ArrayList<Character> LINJAT;
@@ -165,32 +165,32 @@ public class Arvioija {
             { 20, 30, 10, 0, 0, 10, 30, 20 }
     };
 
-    // private static final int[][] V_KUNINKAAN_RUUDUT_LOPPUPELI = {
-    // { -50, -30, -30, -30, -30, -30, -30, -50 },
-    // { -30, -30, 0, 0, 0, 0, -30, -30 },
-    // { -30, -10, 20, 30, 30, 20, -10, -30 },
-    // { -30, -10, 30, 40, 40, 30, -10, -30 },
-    // { -30, -10, 30, 40, 40, 30, -10, -30 },
-    // { -30, -10, 20, 30, 30, 20, -10, -30 },
-    // { -30, -20, -10, 0, 0, -10, -20, -30 },
-    // { -50, -40, -30, -20, -20, -30, -40, -50 }
-    // };
+    private static final int[][] V_KUNINKAAN_RUUDUT_LOPPUPELI = {
+            { -50, -30, -30, -30, -30, -30, -30, -50 },
+            { -30, -30, 0, 0, 0, 0, -30, -30 },
+            { -30, -10, 20, 30, 30, 20, -10, -30 },
+            { -30, -10, 30, 40, 40, 30, -10, -30 },
+            { -30, -10, 30, 40, 40, 30, -10, -30 },
+            { -30, -10, 20, 30, 30, 20, -10, -30 },
+            { -30, -20, -10, 0, 0, -10, -20, -30 },
+            { -50, -40, -30, -20, -20, -30, -40, -50 }
+    };
 
-    // private static final int[][] M_KUNINKAAN_RUUDUT_LOPPUPELI = {
-    // { -50, -40, -30, -20, -20, -30, -40, -50 },
-    // { -30, -20, -10, 0, 0, -10, -20, -30 },
-    // { -30, -10, 20, 30, 30, 20, -10, -30 },
-    // { -30, -10, 30, 40, 40, 30, -10, -30 },
-    // { -30, -10, 30, 40, 40, 30, -10, -30 },
-    // { -30, -10, 20, 30, 30, 20, -10, -30 },
-    // { -30, -30, 0, 0, 0, 0, -30, -30 },
-    // { -50, -30, -30, -30, -30, -30, -30, -50 }
-    // };
+    private static final int[][] M_KUNINKAAN_RUUDUT_LOPPUPELI = {
+            { -50, -40, -30, -20, -20, -30, -40, -50 },
+            { -30, -20, -10, 0, 0, -10, -20, -30 },
+            { -30, -10, 20, 30, 30, 20, -10, -30 },
+            { -30, -10, 30, 40, 40, 30, -10, -30 },
+            { -30, -10, 30, 40, 40, 30, -10, -30 },
+            { -30, -10, 20, 30, 30, 20, -10, -30 },
+            { -30, -30, 0, 0, 0, 0, -30, -30 },
+            { -50, -30, -30, -30, -30, -30, -30, -50 }
+    };
 
     public Arvioija() {
     }
 
-    private int arvioiSijaintienMukaan(int linjaI, int riviI, char nappula, Side puoli) {
+    private int arvioiSijaintienMukaan(int linjaI, int riviI, char nappula, Side puoli, Boolean loppupeli) {
         if (puoli == Side.WHITE) {
             switch (nappula) {
                 case 'p':
@@ -204,6 +204,9 @@ public class Arvioija {
                 case 'q':
                     return V_KUNINGATTAREN_RUUDUT[linjaI][riviI];
                 case 'k':
+                    if (loppupeli) {
+                        return V_KUNINKAAN_RUUDUT_LOPPUPELI[linjaI][riviI];
+                    }
                     return V_KUNINKAAN_RUUDUT[linjaI][riviI];
                 default:
                     return 0;
@@ -221,6 +224,9 @@ public class Arvioija {
                 case 'q':
                     return M_KUNINGATTAREN_RUUDUT[linjaI][riviI];
                 case 'k':
+                    if (loppupeli) {
+                        return M_KUNINKAAN_RUUDUT_LOPPUPELI[linjaI][riviI];
+                    }
                     return M_KUNINKAAN_RUUDUT[linjaI][riviI];
                 default:
                     return 0;
@@ -228,7 +234,7 @@ public class Arvioija {
         }
     }
 
-    public int arvioiPelilauta(Pelilauta lauta) { // Toistaiseksi vain valkoiselle toimii
+    public int arvioiPelilauta(Pelilauta lauta, Side puoli) { // Toistaiseksi vain valkoiselle toimii
         char[][] valkoiset = lauta.getValkoiset();
         char[][] mustat = lauta.getMustat();
         int pisteet = 0;
@@ -236,7 +242,7 @@ public class Arvioija {
             for (int j = 0; j < valkoiset[i].length; j++) {
                 if (valkoiset[i][j] != ' ') {
                     pisteet += PISTEYTYS.get(valkoiset[i][j]);
-                    pisteet += arvioiSijaintienMukaan(i, j, valkoiset[i][j], Side.WHITE);
+                    pisteet += arvioiSijaintienMukaan(i, j, valkoiset[i][j], Side.WHITE, lauta.getLoppupeli());
                 }
             }
         }
@@ -245,11 +251,13 @@ public class Arvioija {
             for (int j = 0; j < mustat[i].length; j++) {
                 if (mustat[i][j] != ' ') {
                     pisteet -= PISTEYTYS.get(mustat[i][j]);
-                    pisteet -= arvioiSijaintienMukaan(i, j, mustat[i][j], Side.BLACK);
+                    pisteet -= arvioiSijaintienMukaan(i, j, mustat[i][j], Side.BLACK, lauta.getLoppupeli());
                 }
             }
         }
-
+        if (puoli == Side.BLACK) {
+            pisteet *= -1;
+        }
         return pisteet;
     }
 }

@@ -91,6 +91,22 @@ public class Pelilauta {
             tehdytSiirrot.add(siirto);
             return;
         }
+        if (siirto.equals("e1c1") && valkoiset[4][0] == 'k') { // Valkoisen tornitus vasemmalle
+            asetaNappulaRuutuun("d1", Side.WHITE, 'r');
+            poistaNappulaRuudusta("a1", Side.WHITE);
+        }
+        if (siirto.equals("e1g1") && valkoiset[4][0] == 'k') { // Valkoisen tornitus oikealle
+            asetaNappulaRuutuun("f1", Side.WHITE, 'r');
+            poistaNappulaRuudusta("h1", Side.WHITE);
+        }
+        if (siirto.equals("e8c8") && mustat[4][7] == 'k') { // Valkoisen tornitus vasemmalle
+            asetaNappulaRuutuun("d8", Side.BLACK, 'r');
+            poistaNappulaRuudusta("a8", Side.BLACK);
+        }
+        if (siirto.equals("e8g8") && mustat[4][7] == 'k') { // Valkoisen tornitus oikealle
+            asetaNappulaRuutuun("f8", Side.BLACK, 'r');
+            poistaNappulaRuudusta("h8", Side.BLACK);
+        }
         asetaNappulaRuutuun(kohderuutu, puoli, getNappulaRuudusta(lahtoruutu));
         poistaNappulaRuudusta(lahtoruutu, puoli);
         tehdytSiirrot.add(siirto);
@@ -101,6 +117,9 @@ public class Pelilauta {
         poistettu = false;
         int linjaI = linjat.indexOf(ruutu.charAt(0));
         int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
+        if (linjaI > 7 || rivi > 7) {
+            System.out.println("linja " + linjaI + " rivi " + rivi);
+        }
         if (puoli == Side.WHITE) {
             valkoiset[linjaI][rivi] = nappula;
             if (mustat[linjaI][rivi] != ' ') { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
@@ -308,6 +327,10 @@ public class Pelilauta {
 
     public char[][] getMustat() { // Yksikkötestejä varten
         return mustat;
+    }
+
+    public Boolean getLoppupeli() {
+        return (tehdytSiirrot.size() > 49);
     }
 
     public void pelaaSiirrotListalta(ArrayList<String> s) {

@@ -31,8 +31,8 @@ public class MinunBot implements ChessBot {
         }
         ArrayList<String> siirrot = this.lauta.etsiLaillisetSiirrot(gamestate.playing);
         // ArrayList<String> jsiirrot = jarjestaSiirrot(lauta, siirrot,
-        // gamestate.playing, this.syvyys - 1);
-        //
+        // gamestate.playing, 3);
+
         if (siirrot.size() > 0) {
             String parasSiirto = siirrot.get(0);
             int parasArvio = Integer.MIN_VALUE;
@@ -60,7 +60,7 @@ public class MinunBot implements ChessBot {
     public int alfabeta(Pelilauta l, int syvyys, Side puoli, int alfa, int beta) {
         if (puoli == Side.WHITE) {
             if (syvyys == 0) {
-                return arvioija.arvioiPelilauta(l);
+                return arvioija.arvioiPelilauta(l, Side.WHITE);
             }
             ArrayList<String> siirrot = l.etsiLaillisetSiirrot(puoli);
             int arvio = Integer.MIN_VALUE;
@@ -81,7 +81,7 @@ public class MinunBot implements ChessBot {
             return arvio;
         } else {
             if (syvyys == 0) {
-                return arvioija.arvioiPelilauta(l);
+                return arvioija.arvioiPelilauta(l, Side.WHITE);
             }
             ArrayList<String> siirrot = l.etsiLaillisetSiirrot(puoli);
             int arvio = Integer.MAX_VALUE;
