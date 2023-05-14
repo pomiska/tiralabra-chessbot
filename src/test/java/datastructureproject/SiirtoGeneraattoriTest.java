@@ -83,6 +83,28 @@ public class SiirtoGeneraattoriTest { // Test
         assertEquals(omatSiirrot.toString(), oikeatSiirrot.toString());
     }
 
+    @Test
+    public void siirrotGeneroidaanOikein2() throws MoveGeneratorException {
+        String siirrotUCI = "e2e4 b8c6 g2g4 e7e5 c2c4 g8f6 f1g2 f8c5 d1e2 e8g8 b2b3 c5d4 e1f1 f6e4 d2d3 e4c5 e2e1 d7d6 c1a3 c5d3 g2e4 d4f2 g4g5 f2g1 e1e3 f7f6 h2h4 c8g4 e3a7 g1d4";
+        this.lauta.pelaaSiirrot(siirrotUCI);
+        siirrotUCI = siirrotUCI.toUpperCase();
+        String[] s = siirrotUCI.split(" ");
+        for (int i = 0; i < s.length; i++) {
+            this.board.doMove(this.setMove(s[i].substring(0, 2), s[i].substring(2, 4), s[i].substring(4)));
+        }
+
+        ArrayList<String> omatSiirrot = new ArrayList<>();
+        omatSiirrot = this.lauta.etsiLaillisetSiirrot(Side.WHITE);
+        MoveList oikeatSiirrotTemp = MoveGenerator.generateLegalMoves(this.board);
+        ArrayList<String> oikeatSiirrot = new ArrayList<>();
+        Collections.sort(omatSiirrot);
+        for (int i = 0; i < oikeatSiirrotTemp.size(); i++) {
+            oikeatSiirrot.add(oikeatSiirrotTemp.get(i).toString());
+        }
+        Collections.sort(oikeatSiirrot);
+        assertEquals(omatSiirrot.toString(), oikeatSiirrot.toString());
+    }
+
     public Move setMove(String starting, String ending, String promote) { // Kopioitu TestBot luokasta
         String promotionPiece = "";
         if (promote.length() > 0) {
