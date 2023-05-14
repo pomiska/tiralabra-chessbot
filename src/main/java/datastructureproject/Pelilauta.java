@@ -6,17 +6,38 @@ import java.util.Arrays;
 import chess.model.Side;
 
 public class Pelilauta {
-    private char[][] valkoiset; // tallennetaan tieto nappuloista tyylillä [linjan indeksi][rivin indeksi] =
-                                // nappulan tyyppi
+
+    /*
+     * Tämän avulla saadaan linjojen indeksit helposti, joka helpottaa taulukoiden
+     * käsittelyä
+     */
+    private static final ArrayList<Character> LINJAT;
+    static {
+        LINJAT = new ArrayList<>();
+        LINJAT.add('a');
+        LINJAT.add('b');
+        LINJAT.add('c');
+        LINJAT.add('d');
+        LINJAT.add('e');
+        LINJAT.add('f');
+        LINJAT.add('g');
+        LINJAT.add('h');
+    }
+
+    /*
+     * Tallennetaan tieto nappuloista tyylillä [linjan indeksi][rivin indeksi] =
+     * nappulan tyyppi
+     */
+    private char[][] valkoiset;
     private char[][] mustat;
-    private ArrayList<Character> linjat;
+
     private ArrayList<String> tehdytSiirrot;
-    private Boolean valkoisenOikealleTornitus; // pidetään kirjaa voiko tornittaa
+
+    /* Pidetään kirjaa voiko tornittaa */
+    private Boolean valkoisenOikealleTornitus;
     private Boolean valkoisenVasemmalleTornitus;
     private Boolean mustanOikealleTornitus;
     private Boolean mustanVasemmalleTornitus;
-    private char poistettuNappula;
-    private Boolean poistettu;
 
     public Pelilauta() {
         this.valkoiset = new char[8][8];
@@ -26,17 +47,6 @@ public class Pelilauta {
         this.valkoisenVasemmalleTornitus = true;
         this.mustanOikealleTornitus = true;
         this.mustanVasemmalleTornitus = true;
-
-        this.linjat = new ArrayList<>();
-        this.linjat.add('a');
-        this.linjat.add('b');
-        this.linjat.add('c');
-        this.linjat.add('d');
-        this.linjat.add('e');
-        this.linjat.add('f');
-        this.linjat.add('g');
-        this.linjat.add('h');
-
         this.uusiLauta();
     }
 
@@ -81,6 +91,11 @@ public class Pelilauta {
         mustat[7][6] = 'p';
     }
 
+    /*
+     * @param siirto pelattava siirto UCI-muodossa
+     * 
+     * @param puoli siirron tekevän pelaajan väri
+     */
     public void teeSiirto(String siirto, Side puoli) {
         String lahtoruutu = siirto.substring(0, 2);
         String kohderuutu = siirto.substring(2, 4);
@@ -99,11 +114,11 @@ public class Pelilauta {
             asetaNappulaRuutuun("f1", Side.WHITE, 'r');
             poistaNappulaRuudusta("h1", Side.WHITE);
         }
-        if (siirto.equals("e8c8") && mustat[4][7] == 'k') { // Valkoisen tornitus vasemmalle
+        if (siirto.equals("e8c8") && mustat[4][7] == 'k') { // Mustan tornitus vasemmalle
             asetaNappulaRuutuun("d8", Side.BLACK, 'r');
             poistaNappulaRuudusta("a8", Side.BLACK);
         }
-        if (siirto.equals("e8g8") && mustat[4][7] == 'k') { // Valkoisen tornitus oikealle
+        if (siirto.equals("e8g8") && mustat[4][7] == 'k') { // Mustan tornitus oikealle
             asetaNappulaRuutuun("f8", Side.BLACK, 'r');
             poistaNappulaRuudusta("h8", Side.BLACK);
         }
@@ -114,31 +129,23 @@ public class Pelilauta {
     }
 
     private void asetaNappulaRuutuun(String ruutu, Side puoli, char nappula) {
-        poistettu = false;
-        int linjaI = linjat.indexOf(ruutu.charAt(0));
+        int linjaI = LINJAT.indexOf(ruutu.charAt(0));
         int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
-        if (linjaI > 7 || rivi > 7) {
-            System.out.println("linja " + linjaI + " rivi " + rivi);
-        }
         if (puoli == Side.WHITE) {
             valkoiset[linjaI][rivi] = nappula;
             if (mustat[linjaI][rivi] != ' ') { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
-                poistettuNappula = mustat[linjaI][rivi];
-                poistettu = true;
                 mustat[linjaI][rivi] = ' ';
             }
-        } else if (puoli == Side.BLACK) {
+        } else {
             mustat[linjaI][rivi] = nappula;
             if (valkoiset[linjaI][rivi] != ' ') { // Jos vastustajalla on nappula meidän kohderuudussa, se poistetaan
-                poistettuNappula = valkoiset[linjaI][rivi];
-                poistettu = true;
                 valkoiset[linjaI][rivi] = ' ';
             }
         }
     }
 
     private void poistaNappulaRuudusta(String ruutu, Side puoli) {
-        int linjaI = linjat.indexOf(ruutu.charAt(0));
+        int linjaI = LINJAT.indexOf(ruutu.charAt(0));
         int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
         if (puoli == Side.WHITE) {
             valkoiset[linjaI][rivi] = ' ';
@@ -147,52 +154,10 @@ public class Pelilauta {
         }
     }
 
-    public void peruViimeisinSiirto() {
-        Side p;
-        if (tehdytSiirrot.size() % 2 == 0) {
-            p = Side.WHITE;
-        } else {
-            p = Side.BLACK;
-        }
-        String s = tehdytSiirrot.get(tehdytSiirrot.size() - 1);
-        tehdytSiirrot.remove(tehdytSiirrot.size() - 1);
-        String lahto = s.substring(0, 2);
-        String kohde = s.substring(2, 4);
-        int lahtoLinjaI = linjat.indexOf(lahto.charAt(0));
-        int lahtoRivi = Character.getNumericValue(lahto.charAt(1)) - 1;
-        int kohdeLinjaI = linjat.indexOf(kohde.charAt(0));
-        int kohdeRivi = Character.getNumericValue(kohde.charAt(1)) - 1;
-        if (s.length() == 5) {
-            if (p == Side.WHITE) {
-                valkoiset[lahtoLinjaI][lahtoRivi] = 'p';
-                if (poistettu) {
-                    mustat[kohdeLinjaI][kohdeRivi] = poistettuNappula;
-                }
-                valkoiset[kohdeLinjaI][kohdeRivi] = ' ';
-            } else {
-                mustat[lahtoLinjaI][lahtoRivi] = 'p';
-                if (poistettu) {
-                    valkoiset[kohdeLinjaI][kohdeRivi] = poistettuNappula;
-                }
-                mustat[kohdeLinjaI][kohdeRivi] = ' ';
-            }
-        } else {
-            if (p == Side.WHITE) {
-                valkoiset[lahtoLinjaI][lahtoRivi] = valkoiset[kohdeLinjaI][kohdeRivi];
-                if (poistettu) {
-                    mustat[kohdeLinjaI][kohdeRivi] = poistettuNappula;
-                }
-                valkoiset[kohdeLinjaI][kohdeRivi] = ' ';
-            } else {
-                mustat[lahtoLinjaI][lahtoRivi] = valkoiset[kohdeLinjaI][kohdeRivi];
-                if (poistettu) {
-                    valkoiset[kohdeLinjaI][kohdeRivi] = poistettuNappula;
-                }
-                mustat[kohdeLinjaI][kohdeRivi] = ' ';
-            }
-        }
-    }
-
+    /*
+     * Jos tehdyn siirron lähtö- tai kohderuutu on tornin tai kuninkaan ruutu,
+     * päivitetään tornituksen status falseksi
+     */
     private void paivitaTornitus(String lahtoruutu, String kohderuutu) {
         if (lahtoruutu.equals("e1")) {
             this.valkoisenOikealleTornitus = false;
@@ -216,6 +181,10 @@ public class Pelilauta {
         }
     }
 
+    /*
+     * Käydään ehdot läpi, joiden takia ei voisi tornittaa ja jos ne eivät täyty
+     * palautetaan true
+     */
     private boolean voikoValkoinenTornittaaVasemmalle(ArrayList<String> siirrot) {
         if (!valkoisenVasemmalleTornitus) {
             return false;
@@ -309,8 +278,46 @@ public class Pelilauta {
         return omatSiirrot;
     }
 
+    /*
+     * Arviointia varten, jotta loppupelissä kuninkaan suotuisat ruudut ovat laudan
+     * keskellä eikä reunoissa
+     */
+    public Boolean getLoppupeli() {
+        return (tehdytSiirrot.size() > 49);
+    }
+
+    public void setValkoiset(char[][] v) {
+        for (int i = 0; i < valkoiset.length; i++) {
+            Arrays.fill(valkoiset[i], ' ');
+        }
+
+        valkoiset = Arrays.stream(v).map(char[]::clone).toArray(char[][]::new);
+    }
+
+    public void setMustat(char[][] m) {
+        for (int i = 0; i < mustat.length; i++) {
+            Arrays.fill(mustat[i], ' ');
+        }
+
+        mustat = Arrays.stream(m).map(char[]::clone).toArray(char[][]::new);
+    }
+
+    /*
+     * Koska siirron peruminen ei toiminut oikein (luotu metodi löytyy alimmaisena
+     * poiskommentoituna) joudutaan luomaan uusi pelilauta ja kopioimaan se jokaista
+     * alfa-beta siirtoa varten. Alunperin kun nappuloista pidettiin kirjaa
+     * HashMapeissa laudan kopioiminen ja pelilautojen luominen hidasti ohjelmaa
+     * huomattavasti, siksi tietorakenteiksi vaihdettiin char-matriisit.
+     */
+    public Pelilauta kopioiPelilauta() {
+        Pelilauta l = new Pelilauta();
+        l.setValkoiset(valkoiset);
+        l.setMustat(mustat);
+        return l;
+    }
+
     public char getNappulaRuudusta(String ruutu) { // Yksikkötestejä varten getteri
-        int linjaI = linjat.indexOf(ruutu.charAt(0));
+        int linjaI = LINJAT.indexOf(ruutu.charAt(0));
         int rivi = Character.getNumericValue(ruutu.charAt(1)) - 1;
         if (valkoiset[linjaI][rivi] != ' ') {
             return valkoiset[linjaI][rivi];
@@ -329,11 +336,13 @@ public class Pelilauta {
         return mustat;
     }
 
-    public Boolean getLoppupeli() {
-        return (tehdytSiirrot.size() > 49);
+    public void setLoppupeliTodeksi() { // yksikkötestejä varten
+        for (int i = tehdytSiirrot.size(); i <= 50; i++) {
+            tehdytSiirrot.add(" ");
+        }
     }
 
-    public void pelaaSiirrotListalta(ArrayList<String> s) {
+    public void pelaaSiirrotListalta(ArrayList<String> s) { // Yksikkötestejä varten
         Side puoli = null;
         for (int i = 0; i < s.size(); i++) {
             String siirto = s.get(i);
@@ -360,26 +369,57 @@ public class Pelilauta {
         }
     }
 
-    public void setValkoiset(char[][] v) {
-        for (int i = 0; i < valkoiset.length; i++) {
-            Arrays.fill(valkoiset[i], ' ');
-        }
+    /*
+     * Tämä ei jostain syystä toiminut, mutta mahdollisesti tulevaisuudessa
+     * tällaisella metodilla voisi parantaa botin laskentanopeutta, joten jätän
+     * tähän poiskommentoituna
+     * 
+     *
+     * public void peruViimeisinSiirto() {
+     * Side p;
+     * if (tehdytSiirrot.size() % 2 == 0) {
+     * p = Side.WHITE;
+     * } else {
+     * p = Side.BLACK;
+     * }
+     * String s = tehdytSiirrot.get(tehdytSiirrot.size() - 1);
+     * tehdytSiirrot.remove(tehdytSiirrot.size() - 1);
+     * String lahto = s.substring(0, 2);
+     * String kohde = s.substring(2, 4);
+     * int lahtoLinjaI = LINJAT.indexOf(lahto.charAt(0));
+     * int lahtoRivi = Character.getNumericValue(lahto.charAt(1)) - 1;
+     * int kohdeLinjaI = LINJAT.indexOf(kohde.charAt(0));
+     * int kohdeRivi = Character.getNumericValue(kohde.charAt(1)) - 1;
+     * if (s.length() == 5) {
+     * if (p == Side.WHITE) {
+     * valkoiset[lahtoLinjaI][lahtoRivi] = 'p';
+     * if (poistettu) {
+     * mustat[kohdeLinjaI][kohdeRivi] = poistettuNappula;
+     * }
+     * valkoiset[kohdeLinjaI][kohdeRivi] = ' ';
+     * } else {
+     * mustat[lahtoLinjaI][lahtoRivi] = 'p';
+     * if (poistettu) {
+     * valkoiset[kohdeLinjaI][kohdeRivi] = poistettuNappula;
+     * }
+     * mustat[kohdeLinjaI][kohdeRivi] = ' ';
+     * }
+     * } else {
+     * if (p == Side.WHITE) {
+     * valkoiset[lahtoLinjaI][lahtoRivi] = valkoiset[kohdeLinjaI][kohdeRivi];
+     * if (poistettu) {
+     * mustat[kohdeLinjaI][kohdeRivi] = poistettuNappula;
+     * }
+     * valkoiset[kohdeLinjaI][kohdeRivi] = ' ';
+     * } else {
+     * mustat[lahtoLinjaI][lahtoRivi] = valkoiset[kohdeLinjaI][kohdeRivi];
+     * if (poistettu) {
+     * valkoiset[kohdeLinjaI][kohdeRivi] = poistettuNappula;
+     * }
+     * mustat[kohdeLinjaI][kohdeRivi] = ' ';
+     * }
+     * }
+     * }
+     */
 
-        valkoiset = Arrays.stream(v).map(char[]::clone).toArray(char[][]::new);
-    }
-
-    public void setMustat(char[][] m) {
-        for (int i = 0; i < mustat.length; i++) {
-            Arrays.fill(mustat[i], ' ');
-        }
-
-        mustat = Arrays.stream(m).map(char[]::clone).toArray(char[][]::new);
-    }
-
-    public Pelilauta kopioiPelilauta() {
-        Pelilauta l = new Pelilauta();
-        l.setValkoiset(valkoiset);
-        l.setMustat(mustat);
-        return l;
-    }
 }

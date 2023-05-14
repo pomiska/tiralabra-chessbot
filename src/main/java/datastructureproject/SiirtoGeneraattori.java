@@ -7,14 +7,47 @@ import chess.model.Side;
 
 public class SiirtoGeneraattori {
 
+    /*
+     * Tallennetaan tieto nappuloista tyylillä [linjan indeksi][rivin indeksi] =
+     * nappulan tyyppi
+     */
     private char[][] valkoiset;
     private char[][] mustat;
+
+    /*
+     * Lista koordinaateista, joissa on omat tai vastustajan nappulat, apuna eri
+     * metodeille
+     */
     private ArrayList<String> omatNappulat;
     private ArrayList<String> vastustajanNappulat;
-    private ArrayList<String> suojatut; // Nappulat joita kuningas ei voi napata, koska joku muu vastustajan nappula
-                                        // suojaa niitä
-    private ArrayList<Character> linjat;
+
+    /*
+     * Nappulat joita kuningas ei voi napata, koska joku muu vastustajan nappula
+     * suojaa niitä
+     */
+    private ArrayList<String> suojatut;
+
+    /*
+     * Tämän avulla saadaan linjojen indeksit helposti, joka helpottaa taulukoiden
+     * käsittelyä
+     */
+    private static final ArrayList<Character> LINJAT;
+    static {
+        LINJAT = new ArrayList<>();
+        LINJAT.add('a');
+        LINJAT.add('b');
+        LINJAT.add('c');
+        LINJAT.add('d');
+        LINJAT.add('e');
+        LINJAT.add('f');
+        LINJAT.add('g');
+        LINJAT.add('h');
+    }
+
+    /* Tarkasteltavan pelaajan puoli */
     private Side puoli;
+
+    /* Ruutu, jossa kuninkaan shakkiin laittava nappula sijaitsee */
     private String shakittaja;
 
     public SiirtoGeneraattori(char[][] valkoiset, char[][] mustat, Side puoli) {
@@ -24,16 +57,6 @@ public class SiirtoGeneraattori {
         vastustajanNappulat = new ArrayList<>();
         this.suojatut = new ArrayList<>();
         this.puoli = puoli;
-
-        this.linjat = new ArrayList<>();
-        this.linjat.add('a');
-        this.linjat.add('b');
-        this.linjat.add('c');
-        this.linjat.add('d');
-        this.linjat.add('e');
-        this.linjat.add('f');
-        this.linjat.add('g');
-        this.linjat.add('h');
     }
 
     public ArrayList<String> valkoisenSiirrot() {
@@ -43,7 +66,7 @@ public class SiirtoGeneraattori {
         suojatut.clear();
         for (int i = 0; i < valkoiset.length; i++) {
             for (int j = 0; j < valkoiset[i].length; j++) {
-                String ruutu = linjat.get(i).toString() + (j + 1);
+                String ruutu = LINJAT.get(i).toString() + (j + 1);
                 if (valkoiset[i][j] != ' ') {
                     omatNappulat.add(ruutu);
                 } else if (mustat[i][j] != ' ') {
@@ -57,7 +80,7 @@ public class SiirtoGeneraattori {
                 if (nappula == ' ') {
                     continue;
                 }
-                String ruutu = linjat.get(i).toString() + (j + 1);
+                String ruutu = LINJAT.get(i).toString() + (j + 1);
                 switch (nappula) {
                     case 'p':
                         siirrot.addAll(valkoisenSotilaanSiirrot(ruutu));
@@ -93,7 +116,7 @@ public class SiirtoGeneraattori {
         suojatut.clear();
         for (int i = 0; i < mustat.length; i++) {
             for (int j = 0; j < mustat[i].length; j++) {
-                String ruutu = linjat.get(i).toString() + (j + 1);
+                String ruutu = LINJAT.get(i).toString() + (j + 1);
                 if (mustat[i][j] != ' ') {
                     omatNappulat.add(ruutu);
                 } else if (valkoiset[i][j] != ' ') {
@@ -108,7 +131,7 @@ public class SiirtoGeneraattori {
                 if (nappula == ' ') {
                     continue;
                 }
-                String ruutu = linjat.get(i).toString() + (j + 1);
+                String ruutu = LINJAT.get(i).toString() + (j + 1);
                 switch (nappula) {
                     case 'p':
                         siirrot.addAll(mustanSotilaanSiirrot(ruutu));
@@ -142,13 +165,13 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
+        int linjaI = LINJAT.indexOf(linja);
 
-        for (int i = 1; i <= 8; i++) { // Oikealle ylös
+        for (int i = 1; i <= 8; i++) {
             if ((linjaI + i) > 7 || rivi + i > 8) {
                 break;
             }
-            String kohde = linjat.get(linjaI + i) + String.valueOf(rivi + i);
+            String kohde = LINJAT.get(linjaI + i) + String.valueOf(rivi + i);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
                 break;
@@ -173,13 +196,13 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
+        int linjaI = LINJAT.indexOf(linja);
 
-        for (int i = 1; i <= 8; i++) { // Oikealle alas
+        for (int i = 1; i <= 8; i++) {
             if ((linjaI + i) > 7 || rivi - i < 1) {
                 break;
             }
-            String kohde = linjat.get(linjaI + i) + String.valueOf(rivi - i);
+            String kohde = LINJAT.get(linjaI + i) + String.valueOf(rivi - i);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
                 break;
@@ -204,13 +227,13 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
+        int linjaI = LINJAT.indexOf(linja);
 
-        for (int i = 1; i <= 8; i++) { // Vasemmalle alas
+        for (int i = 1; i <= 8; i++) {
             if ((linjaI - i) < 0 || rivi - i < 1) {
                 break;
             }
-            String kohde = linjat.get(linjaI - i) + String.valueOf(rivi - i);
+            String kohde = LINJAT.get(linjaI - i) + String.valueOf(rivi - i);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
                 break;
@@ -235,13 +258,13 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
+        int linjaI = LINJAT.indexOf(linja);
 
-        for (int i = 1; i <= 8; i++) { // Vasemmalle ylös
+        for (int i = 1; i <= 8; i++) {
             if ((linjaI - i) < 0 || rivi + i > 8) {
                 break;
             }
-            String kohde = linjat.get(linjaI - i) + String.valueOf(rivi + i);
+            String kohde = LINJAT.get(linjaI - i) + String.valueOf(rivi + i);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
                 break;
@@ -275,30 +298,30 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
+        int linjaI = LINJAT.indexOf(linja);
         if (rivi < 7 && linja != 'h') {
-            kohteet.add(linjat.get(linjaI + 1) + String.valueOf(rivi + 2)); // Oikealle ylöspäin ylempi
+            kohteet.add(LINJAT.get(linjaI + 1) + String.valueOf(rivi + 2)); // Oikealle ylöspäin ylempi
         }
         if (rivi < 8 && linjaI < 6) {
-            kohteet.add(linjat.get(linjaI + 2) + String.valueOf(rivi + 1)); // Oikealle ylöspäin alempi
+            kohteet.add(LINJAT.get(linjaI + 2) + String.valueOf(rivi + 1)); // Oikealle ylöspäin alempi
         }
         if (rivi > 1 && linjaI < 6) {
-            kohteet.add(linjat.get(linjaI + 2) + String.valueOf(rivi - 1)); // Oikealle alaspäin ylempi
+            kohteet.add(LINJAT.get(linjaI + 2) + String.valueOf(rivi - 1)); // Oikealle alaspäin ylempi
         }
         if (rivi > 2 && linja != 'h') {
-            kohteet.add(linjat.get(linjaI + 1) + String.valueOf(rivi - 2)); // Oikealle alaspäin alempi
+            kohteet.add(LINJAT.get(linjaI + 1) + String.valueOf(rivi - 2)); // Oikealle alaspäin alempi
         }
         if (rivi > 2 && linja != 'a') {
-            kohteet.add(linjat.get(linjaI - 1) + String.valueOf(rivi - 2)); // Vasemmalle alaspäin alempi
+            kohteet.add(LINJAT.get(linjaI - 1) + String.valueOf(rivi - 2)); // Vasemmalle alaspäin alempi
         }
         if (rivi > 1 && linjaI > 1) {
-            kohteet.add(linjat.get(linjaI - 2) + String.valueOf(rivi - 1)); // Vasemmalle alaspäin ylempi
+            kohteet.add(LINJAT.get(linjaI - 2) + String.valueOf(rivi - 1)); // Vasemmalle alaspäin ylempi
         }
         if (rivi < 8 && linjaI > 1) {
-            kohteet.add(linjat.get(linjaI - 2) + String.valueOf(rivi + 1)); // Vasemmalle ylöspäin alempi
+            kohteet.add(LINJAT.get(linjaI - 2) + String.valueOf(rivi + 1)); // Vasemmalle ylöspäin alempi
         }
         if (rivi < 7 && linja != 'a') {
-            kohteet.add(linjat.get(linjaI - 1) + String.valueOf(rivi + 2)); // Vasemmalle ylöspäin ylempi
+            kohteet.add(LINJAT.get(linjaI - 1) + String.valueOf(rivi + 2)); // Vasemmalle ylöspäin ylempi
         }
 
         for (int i = 0; i < kohteet.size(); i++) {
@@ -317,9 +340,9 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
-        for (int i = linjaI - 1; i > 0; i--) { // Vasemmalle
-            String kohde = linjat.get(i) + String.valueOf(rivi);
+        int linjaI = LINJAT.indexOf(linja);
+        for (int i = linjaI - 1; i > 0; i--) {
+            String kohde = LINJAT.get(i) + String.valueOf(rivi);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
                 break;
@@ -342,9 +365,9 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        int linjaI = linjat.indexOf(linja);
-        for (int i = linjaI + 1; i < linjat.size(); i++) { // Oikealle
-            String kohde = linjat.get(i) + String.valueOf(rivi);
+        int linjaI = LINJAT.indexOf(linja);
+        for (int i = linjaI + 1; i < LINJAT.size(); i++) {
+            String kohde = LINJAT.get(i) + String.valueOf(rivi);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
                 break;
@@ -367,7 +390,7 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        for (int i = rivi + 1; i <= 8; i++) { // Ylös
+        for (int i = rivi + 1; i <= 8; i++) {
             String kohde = linja + String.valueOf(i);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
@@ -391,7 +414,7 @@ public class SiirtoGeneraattori {
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         ArrayList<String> kohteet = new ArrayList<>();
-        for (int i = rivi - 1; i > 0; i--) { // Alas
+        for (int i = rivi - 1; i > 0; i--) {
             String kohde = linja + String.valueOf(i);
             if (omatNappulat.contains(kohde)) {
                 suojatut.add(kohde);
@@ -431,22 +454,22 @@ public class SiirtoGeneraattori {
             kohteet.add(linja + String.valueOf(rivi - 1)); // Alempi ruutu
         }
         if (linja != 'h' && rivi < 8) {
-            kohteet.add(linjat.get((linjat.indexOf(linja) + 1)) + String.valueOf(rivi + 1)); // Yläoikea
+            kohteet.add(LINJAT.get((LINJAT.indexOf(linja) + 1)) + String.valueOf(rivi + 1)); // Yläoikea
         }
         if (linja != 'h') {
-            kohteet.add(linjat.get((linjat.indexOf(linja) + 1)) + String.valueOf(rivi)); // Oikea
+            kohteet.add(LINJAT.get((LINJAT.indexOf(linja) + 1)) + String.valueOf(rivi)); // Oikea
         }
         if (linja != 'h' && rivi > 1) {
-            kohteet.add(linjat.get((linjat.indexOf(linja) + 1)) + String.valueOf(rivi - 1)); // Alaoikea
+            kohteet.add(LINJAT.get((LINJAT.indexOf(linja) + 1)) + String.valueOf(rivi - 1)); // Alaoikea
         }
         if (linja != 'a' && rivi > 1) {
-            kohteet.add(linjat.get((linjat.indexOf(linja) - 1)) + String.valueOf(rivi - 1)); // Alavasen
+            kohteet.add(LINJAT.get((LINJAT.indexOf(linja) - 1)) + String.valueOf(rivi - 1)); // Alavasen
         }
         if (linja != 'a') {
-            kohteet.add(linjat.get((linjat.indexOf(linja) - 1)) + String.valueOf(rivi)); // Vasen
+            kohteet.add(LINJAT.get((LINJAT.indexOf(linja) - 1)) + String.valueOf(rivi)); // Vasen
         }
         if (linja != 'a' && rivi < 8) {
-            kohteet.add(linjat.get((linjat.indexOf(linja) - 1)) + String.valueOf(rivi + 1)); // Ylävasen
+            kohteet.add(LINJAT.get((LINJAT.indexOf(linja) - 1)) + String.valueOf(rivi + 1)); // Ylävasen
         }
 
         for (int i = 0; i < kohteet.size(); i++) {
@@ -470,7 +493,7 @@ public class SiirtoGeneraattori {
         String k1 = linja + (String.valueOf((rivi + 1)));
         String k2 = linja + (String.valueOf((rivi + 2)));
         if (linja != 'a') {
-            String vasen = linjat.get((linjat.indexOf(linja)) - 1).toString();
+            String vasen = LINJAT.get((LINJAT.indexOf(linja)) - 1).toString();
             String k3 = vasen + (String.valueOf((rivi + 1)));
             if (vastustajanNappulat.contains(k3)) {
                 siirrot.add(ruutu + k3);
@@ -479,7 +502,7 @@ public class SiirtoGeneraattori {
             }
         }
         if (linja != 'h') {
-            String oikea = linjat.get((linjat.indexOf(linja)) + 1).toString();
+            String oikea = LINJAT.get((LINJAT.indexOf(linja)) + 1).toString();
             String k4 = oikea + (String.valueOf((rivi + 1)));
             if (vastustajanNappulat.contains(k4)) {
                 siirrot.add(ruutu + k4);
@@ -504,34 +527,42 @@ public class SiirtoGeneraattori {
         return siirrot;
     }
 
+    /*
+     * Tarvitaan tieto ruuduista, joista sotilaat voisivat napata nappulan, jottei
+     * siirretä kuningasta näihin ruutuihin
+     */
     private ArrayList<String> valkoisenSotilaanNappaavatSiirrot(String ruutu) {
         ArrayList<String> siirrot = new ArrayList<>();
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         if (linja != 'a') {
-            String vasen = linjat.get((linjat.indexOf(linja)) - 1).toString();
+            String vasen = LINJAT.get((LINJAT.indexOf(linja)) - 1).toString();
             String kohde = vasen + (String.valueOf((rivi + 1)));
             siirrot.add(ruutu + kohde);
         }
         if (linja != 'h') {
-            String oikea = linjat.get((linjat.indexOf(linja)) + 1).toString();
+            String oikea = LINJAT.get((LINJAT.indexOf(linja)) + 1).toString();
             String kohde2 = oikea + (String.valueOf((rivi + 1)));
             siirrot.add(ruutu + kohde2);
         }
         return siirrot;
     }
 
+    /*
+     * Tarvitaan tieto ruuduista, joista sotilaat voisivat napata nappulan, jottei
+     * siirretä kuningasta näihin ruutuihin
+     */
     private ArrayList<String> mustanSotilaanNappaavatSiirrot(String ruutu) {
         ArrayList<String> siirrot = new ArrayList<>();
         char linja = ruutu.charAt(0);
         int rivi = Character.getNumericValue(ruutu.charAt(1));
         if (linja != 'a') {
-            String vasen = linjat.get((linjat.indexOf(linja)) - 1).toString();
+            String vasen = LINJAT.get((LINJAT.indexOf(linja)) - 1).toString();
             String kohde = vasen + (String.valueOf((rivi - 1)));
             siirrot.add(ruutu + kohde);
         }
         if (linja != 'h') {
-            String oikea = linjat.get((linjat.indexOf(linja)) + 1).toString();
+            String oikea = LINJAT.get((LINJAT.indexOf(linja)) + 1).toString();
             String kohde2 = oikea + (String.valueOf((rivi - 1)));
             siirrot.add(ruutu + kohde2);
         }
@@ -545,7 +576,7 @@ public class SiirtoGeneraattori {
         String k1 = linja + (String.valueOf((rivi - 1)));
         String k2 = linja + (String.valueOf((rivi - 2)));
         if (linja != 'a') {
-            String vasen = linjat.get((linjat.indexOf(linja)) - 1).toString();
+            String vasen = LINJAT.get((LINJAT.indexOf(linja)) - 1).toString();
             String k3 = vasen + (String.valueOf((rivi - 1)));
             if (vastustajanNappulat.contains(k3)) {
                 siirrot.add(ruutu + k3);
@@ -554,7 +585,7 @@ public class SiirtoGeneraattori {
             }
         }
         if (linja != 'h') {
-            String oikea = linjat.get((linjat.indexOf(linja)) + 1).toString();
+            String oikea = LINJAT.get((LINJAT.indexOf(linja)) + 1).toString();
             String k4 = oikea + (String.valueOf((rivi - 1)));
             if (vastustajanNappulat.contains(k4)) {
                 siirrot.add(ruutu + k4);
@@ -579,9 +610,11 @@ public class SiirtoGeneraattori {
         return siirrot;
     }
 
-    private HashMap<String, String> etsiKiinnitetytRuudut() { // Eli ruudut, joista nappulaa ei voi siirtää
-        // sillä kuningas
-        // joutuisi shakkiin
+    /*
+     * Etsitään ruudut, joista nappulaa ei voida siirtää, sillä kuningas joutuisi
+     * shakkiin
+     */
+    private HashMap<String, String> etsiKiinnitetytRuudut() {
         String kuninkaanRuutu = getKuninkaanRuutu(puoli);
         HashMap<String, String> kiinnitetyt = new HashMap<>();
         HashMap<String, NappulaTyyppi> omat = new HashMap<>();
@@ -592,8 +625,8 @@ public class SiirtoGeneraattori {
         String kiinnittavaRuutu = "";
         String ruutu = "";
 
-        for (int i = linjat.indexOf(linja) + 1; i < linjat.size(); i++) { // Oikealle vaaka
-            ruutu = linjat.get(i) + String.valueOf(rivi);
+        for (int i = LINJAT.indexOf(linja) + 1; i < LINJAT.size(); i++) { // Oikealle vaaka
+            ruutu = LINJAT.get(i) + String.valueOf(rivi);
             if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
@@ -620,8 +653,8 @@ public class SiirtoGeneraattori {
         kiinnitettyRuutu = "";
         kiinnittavaRuutu = "";
 
-        for (int i = linjat.indexOf(linja) - 1; i > 0; i--) { // Vasemmalle vaaka
-            ruutu = linjat.get(i) + String.valueOf(rivi);
+        for (int i = LINJAT.indexOf(linja) - 1; i > 0; i--) { // Vasemmalle vaaka
+            ruutu = LINJAT.get(i) + String.valueOf(rivi);
             if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
                 break;
@@ -704,12 +737,12 @@ public class SiirtoGeneraattori {
         kiinnitettyRuutu = "";
         kiinnittavaRuutu = "";
 
-        int linjaI = linjat.indexOf(linja) + 1;
+        int linjaI = LINJAT.indexOf(linja) + 1;
         for (int i = rivi + 1; i <= 8; i++) { // Oikealle ylös vinoon
             if (linjaI > 7) {
                 break;
             }
-            ruutu = linjat.get(linjaI) + String.valueOf(i);
+            ruutu = LINJAT.get(linjaI) + String.valueOf(i);
             linjaI++;
             if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
@@ -737,12 +770,12 @@ public class SiirtoGeneraattori {
         kiinnitettyRuutu = "";
         kiinnittavaRuutu = "";
 
-        linjaI = linjat.indexOf(linja) - 1;
+        linjaI = LINJAT.indexOf(linja) - 1;
         for (int i = rivi - 1; i > 0; i--) { // Vasemmalle alas vinoon
             if (linjaI < 0) {
                 break;
             }
-            ruutu = linjat.get(linjaI) + String.valueOf(i);
+            ruutu = LINJAT.get(linjaI) + String.valueOf(i);
             linjaI--;
             if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
@@ -770,12 +803,12 @@ public class SiirtoGeneraattori {
         kiinnitettyRuutu = "";
         kiinnittavaRuutu = "";
 
-        linjaI = linjat.indexOf(linja) + 1;
+        linjaI = LINJAT.indexOf(linja) + 1;
         for (int i = rivi - 1; i > 0; i--) { // Oikealle alas vinoon
             if (linjaI > 7) {
                 break;
             }
-            ruutu = linjat.get(linjaI) + String.valueOf(i);
+            ruutu = LINJAT.get(linjaI) + String.valueOf(i);
             linjaI++;
             if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
@@ -803,12 +836,12 @@ public class SiirtoGeneraattori {
         kiinnitettyRuutu = "";
         kiinnittavaRuutu = "";
 
-        linjaI = linjat.indexOf(linja) - 1;
+        linjaI = LINJAT.indexOf(linja) - 1;
         for (int i = rivi + 1; i <= 8; i++) { // Vasemmalle ylös vinoon
             if (linjaI < 0) {
                 break;
             }
-            ruutu = linjat.get(linjaI) + String.valueOf(i);
+            ruutu = LINJAT.get(linjaI) + String.valueOf(i);
             linjaI--;
             if (!kiinnitettyRuutu.isEmpty() && omat.containsKey(ruutu)) {
                 kiinnitettyRuutu = "";
@@ -871,10 +904,10 @@ public class SiirtoGeneraattori {
         String kuninkaanTakainenRuutu = "";
         if (puoli == Side.WHITE) {
             shakittajanTyyppi = getNappulaTyyppi(
-                    mustat[linjat.indexOf(shakittaja.charAt(0))][Character.getNumericValue(shakittaja.charAt(1)) - 1]);
+                    mustat[LINJAT.indexOf(shakittaja.charAt(0))][Character.getNumericValue(shakittaja.charAt(1)) - 1]);
         } else {
             shakittajanTyyppi = getNappulaTyyppi(
-                    valkoiset[linjat.indexOf(shakittaja.charAt(0))][Character.getNumericValue(shakittaja.charAt(1))
+                    valkoiset[LINJAT.indexOf(shakittaja.charAt(0))][Character.getNumericValue(shakittaja.charAt(1))
                             - 1]);
         }
         for (int i = 0; i < siirrot.size(); i++) {
@@ -891,8 +924,8 @@ public class SiirtoGeneraattori {
         int rivi = Character.getNumericValue(kuninkaanRuutu.charAt(1));
         char sLinja = shakittaja.charAt(0);
         int sRivi = Character.getNumericValue(shakittaja.charAt(1));
-        int linjaI = linjat.indexOf(linja);
-        int sLinjaI = linjat.indexOf(sLinja);
+        int linjaI = LINJAT.indexOf(linja);
+        int sLinjaI = LINJAT.indexOf(sLinja);
         if (shakittajanTyyppi == NappulaTyyppi.TORNI || shakittajanTyyppi == NappulaTyyppi.KUNINGATAR) {
             if (rivi == sRivi || linjaI == sLinjaI) { // Ettei kuningattaren torni ja lähettisiirrot mene sekaisin
                 ArrayList<String> shakittajanSiirrot = new ArrayList<>();
@@ -920,9 +953,9 @@ public class SiirtoGeneraattori {
                         shakittajanSiirrot = torniOikealle(shakittaja);
                     }
                     if (linjaI < sLinjaI && linjaI > 0) {
-                        kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf(rivi);
+                        kuninkaanTakainenRuutu = LINJAT.get(linjaI - 1) + String.valueOf(rivi);
                     } else if (linjaI > sLinjaI && linjaI < 7) {
-                        kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf(rivi);
+                        kuninkaanTakainenRuutu = LINJAT.get(linjaI + 1) + String.valueOf(rivi);
                     }
                     for (int i = 0; i < shakittajanSiirrot.size(); i++) {
                         if (!shakittajanSiirrot.get(i).substring(2).equals(kuninkaanRuutu)
@@ -938,22 +971,22 @@ public class SiirtoGeneraattori {
                 if (rivi < sRivi && linjaI < sLinjaI) {
                     shakittajanSiirrot = lahettiVasemmalleAlas(shakittaja);
                     if (rivi > 1 && linjaI > 0) {
-                        kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf((rivi - 1));
+                        kuninkaanTakainenRuutu = LINJAT.get(linjaI - 1) + String.valueOf((rivi - 1));
                     }
                 } else if (rivi > sRivi && linjaI < sLinjaI) {
                     shakittajanSiirrot = lahettiVasemmalleYlos(shakittaja);
                     if (rivi < 8 && linjaI > 0) {
-                        kuninkaanTakainenRuutu = linjat.get(linjaI - 1) + String.valueOf((rivi + 1));
+                        kuninkaanTakainenRuutu = LINJAT.get(linjaI - 1) + String.valueOf((rivi + 1));
                     }
                 } else if (rivi < sRivi && linjaI > sLinjaI) {
                     shakittajanSiirrot = lahettiOikealleAlas(shakittaja);
                     if (rivi > 1 && linjaI < 7) {
-                        kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf((rivi - 1));
+                        kuninkaanTakainenRuutu = LINJAT.get(linjaI + 1) + String.valueOf((rivi - 1));
                     }
                 } else if (rivi > sRivi && linjaI > sLinjaI) {
                     shakittajanSiirrot = lahettiOikealleYlos(shakittaja);
                     if (rivi < 8 && linjaI < 7) {
-                        kuninkaanTakainenRuutu = linjat.get(linjaI + 1) + String.valueOf((rivi + 1));
+                        kuninkaanTakainenRuutu = LINJAT.get(linjaI + 1) + String.valueOf((rivi + 1));
                     }
                 }
                 for (int i = 0; i < shakittajanSiirrot.size(); i++) {
@@ -977,16 +1010,23 @@ public class SiirtoGeneraattori {
     private ArrayList<String> poistaKuninkaanLaittomat(ArrayList<String> siirrot) {
         ArrayList<String> vastustajanSiirrot = new ArrayList<>();
         ArrayList<String> vastustajanKohteet = new ArrayList<>();
-        ArrayList<String> sotilasKorjaus = new ArrayList<>(); // Korjataan sotilaiden siirrot erillisellä listalla,
-                                                              // jotta vältytään loputtomalta for-loopilta
+
+        /*
+         * Korjataan sotilaiden siirrot erillisellä listalla,
+         * jotta vältytään loputtomalta for-loopilta
+         */
+        ArrayList<String> sotilasKorjaus = new ArrayList<>();
         String kuninkaanRuutu = getKuninkaanRuutu(puoli);
         if (puoli == Side.WHITE) {
             vastustajanSiirrot = mustanSiirrot();
-            // Koska halutaan tietää mihin ruutuihin ei voida liikuttaa kuningasta,
-            // joudutaan korjaamaan listalta sotilaiden siirrot
+
+            /*
+             * Koska halutaan tietää mihin ruutuihin ei voida liikuttaa kuningasta,
+             * joudutaan korjaamaan listalta sotilaiden siirrot
+             */
             for (int i = 0; i < vastustajanSiirrot.size(); i++) {
                 String ruutu = vastustajanSiirrot.get(i).substring(0, 2);
-                if (mustat[linjat.indexOf(ruutu.charAt(0))][Character.getNumericValue(ruutu.charAt(1)) - 1] == 'p') {
+                if (mustat[LINJAT.indexOf(ruutu.charAt(0))][Character.getNumericValue(ruutu.charAt(1)) - 1] == 'p') {
                     vastustajanSiirrot.remove(i);
                     i--;
                     sotilasKorjaus.addAll(mustanSotilaanNappaavatSiirrot(ruutu));
@@ -996,7 +1036,7 @@ public class SiirtoGeneraattori {
             vastustajanSiirrot = valkoisenSiirrot();
             for (int i = 0; i < vastustajanSiirrot.size(); i++) {
                 String ruutu = vastustajanSiirrot.get(i).substring(0, 2);
-                if (valkoiset[linjat.indexOf(ruutu.charAt(0))][Character.getNumericValue(ruutu.charAt(1)) - 1] == 'p') {
+                if (valkoiset[LINJAT.indexOf(ruutu.charAt(0))][Character.getNumericValue(ruutu.charAt(1)) - 1] == 'p') {
                     vastustajanSiirrot.remove(i);
                     i--;
                     sotilasKorjaus.addAll(valkoisenSotilaanNappaavatSiirrot(ruutu));
@@ -1047,11 +1087,14 @@ public class SiirtoGeneraattori {
         return laillisetSiirrot;
     }
 
+    /*
+     * @return missä ruudussa kuningas sijaitsee
+     */
     private String getKuninkaanRuutu(Side puoli) {
         if (puoli == Side.WHITE) {
             for (int i = 0; i < valkoiset.length; i++) {
                 for (int j = 0; j < valkoiset[i].length; j++) {
-                    String ruutu = linjat.get(i).toString() + (j + 1);
+                    String ruutu = LINJAT.get(i).toString() + (j + 1);
                     if (valkoiset[i][j] == 'k') {
                         return ruutu;
                     }
@@ -1060,7 +1103,7 @@ public class SiirtoGeneraattori {
         } else {
             for (int i = 0; i < mustat.length; i++) {
                 for (int j = 0; j < mustat[i].length; j++) {
-                    String ruutu = linjat.get(i).toString() + (j + 1);
+                    String ruutu = LINJAT.get(i).toString() + (j + 1);
                     if (mustat[i][j] == 'k') {
                         return ruutu;
                     }
@@ -1070,6 +1113,12 @@ public class SiirtoGeneraattori {
         return "";
     }
 
+    /*
+     * Aiemmin tieto nappuloista tallennettiin HashMapeissa tyylillä <Ruutu,
+     * NappulaTyyppi>, mutta refaktoroinnin jälkeen siirryttiin tallettamaan tieto
+     * nappulan tyypistä vain Charactereillä. Ei kuitenkaan jaksettu alkaa
+     * muuttamaan koko koodia, joten siksi tämä getteri
+     */
     private NappulaTyyppi getNappulaTyyppi(char nappula) {
         switch (nappula) {
             case 'p':

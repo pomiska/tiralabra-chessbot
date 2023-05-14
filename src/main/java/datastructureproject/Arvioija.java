@@ -5,10 +5,12 @@ import java.util.HashMap;
 
 import chess.model.Side;
 
-// Lähteenä käytetty https://www.chessprogramming.org/Simplified_Evaluation_Function
-
+/*
+*Pisteytyksen lähteenä käytetty https://www.chessprogramming.org/Simplified_Evaluation_Function
+*/
 public class Arvioija {
 
+    /* Nappuloiden pisteytys */
     private static final HashMap<Character, Integer> PISTEYTYS;
     static {
         PISTEYTYS = new HashMap<>();
@@ -20,9 +22,10 @@ public class Arvioija {
         PISTEYTYS.put('k', 20000);
     }
 
+    /* Helpottaa taulukoiden käsittelyä kun saadaan linjojen indeksit */
     private static final ArrayList<Character> LINJAT;
     static {
-        LINJAT = new ArrayList<>(); // Helpottaa pisteytyksen toteuttamista
+        LINJAT = new ArrayList<>();
         LINJAT.add('a');
         LINJAT.add('b');
         LINJAT.add('c');
@@ -33,6 +36,7 @@ public class Arvioija {
         LINJAT.add('h');
     }
 
+    /* Nappuloiden pisteytys eri sijainneissa tyylillä int[linja][rivi] */
     private static final int[][] V_SOTILAAN_RUUDUT = {
             { 0, 0, 0, 0, 0, 0, 0, 0 },
             { 5, 10, 10, -20, -20, 10, 10, 5 },
@@ -44,6 +48,11 @@ public class Arvioija {
             { 0, 0, 0, 0, 0, 0, 0, 0 }
     };
 
+    /*
+     * Sama pisteytys kuin valkoisella mutta peilikuvana.
+     * Olisin voinut luoda metodin, jonka avulla taulukoista olisi aina luotu
+     * peilikuva, mutta se olisi todennäköisesti hidastanut botin laskentaa.
+     */
     private static final int[][] M_SOTILAAN_RUUDUT = {
             { 0, 0, 0, 0, 0, 0, 0, 0 },
             { 50, 50, 50, 50, 50, 50, 50, 50 },
@@ -165,6 +174,10 @@ public class Arvioija {
             { 20, 30, 10, 0, 0, 10, 30, 20 }
     };
 
+    /*
+     * Pelin lähetessä loppua halutaan, ettei kuningas pyri olemaan enää laudan
+     * reunoilla
+     */
     private static final int[][] V_KUNINKAAN_RUUDUT_LOPPUPELI = {
             { -50, -30, -30, -30, -30, -30, -30, -50 },
             { -30, -30, 0, 0, 0, 0, -30, -30 },
@@ -190,6 +203,19 @@ public class Arvioija {
     public Arvioija() {
     }
 
+    /*
+     * @param linjaI linjan indeksi
+     * 
+     * @param riviI rivin indeksi
+     * 
+     * @param nappula nappulan tyyppi
+     * 
+     * @param puoli arvioitavan pelaajan puoli
+     * 
+     * @loppupeli jos true, lasketaan kuninkaan sijainti eri taulukosta
+     * 
+     * @return laskettavan nappulan pisteytys sen sijainnin mukaan
+     */
     private int arvioiSijaintienMukaan(int linjaI, int riviI, char nappula, Side puoli, Boolean loppupeli) {
         if (puoli == Side.WHITE) {
             switch (nappula) {
@@ -234,7 +260,14 @@ public class Arvioija {
         }
     }
 
-    public int arvioiPelilauta(Pelilauta lauta, Side puoli) { // Toistaiseksi vain valkoiselle toimii
+    /*
+     * @param lauta laskettava pelilauta
+     * 
+     * @puoli kumpaa puolta arvioidaan
+     * 
+     * @return pisteytys laudan tilanteen mukaan
+     */
+    public int arvioiPelilauta(Pelilauta lauta, Side puoli) {
         char[][] valkoiset = lauta.getValkoiset();
         char[][] mustat = lauta.getMustat();
         int pisteet = 0;
@@ -255,6 +288,12 @@ public class Arvioija {
                 }
             }
         }
+
+        /*
+         * Oletuksena lasketaan pisteytys valkoiselle pelaajalle, mutta jos halutaan
+         * laskea pisteytys mustalle pelaajalle palautetaan lasketun pisteytyksen
+         * vastaluku
+         */
         if (puoli == Side.BLACK) {
             pisteet *= -1;
         }
