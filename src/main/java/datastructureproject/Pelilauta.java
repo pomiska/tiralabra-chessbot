@@ -369,6 +369,22 @@ public class Pelilauta {
         }
     }
 
+    public Boolean getValkoisenVasemmalleTornitus() { // Yksikkötestejä varten
+        return valkoisenVasemmalleTornitus;
+    }
+
+    public Boolean getValkoisenOikealleTornitus() { // Yksikkötestejä varten
+        return valkoisenOikealleTornitus;
+    }
+
+    public Boolean getMustanVasemmalleTornitus() { // Yksikkötestejä varten
+        return mustanVasemmalleTornitus;
+    }
+
+    public Boolean getMustanOikealleTornitus() { // Yksikkötestejä varten
+        return mustanOikealleTornitus;
+    }
+
     /*
      * Tämä ei jostain syystä toiminut, mutta mahdollisesti tulevaisuudessa
      * tällaisella metodilla voisi parantaa botin laskentanopeutta, joten jätän
