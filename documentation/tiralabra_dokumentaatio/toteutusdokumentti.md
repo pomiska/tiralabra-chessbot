@@ -38,19 +38,7 @@ aikavaativuus parhaassa tapauksessa on O(n^(m/2)) ja pahimmassa tapauksessa, eli
 järjestämisellä ennen kuin se annetaan algoritmin käsittelyyn, mutta tätä ei keretty onnistuneesti toteuttaa. Laskentasyvyyden ollessa 4 botti onnistui välillä voittamaan Stockfish 14-botin 
 tason 4, mutta näille eri tasoille ei löydy varmistettua ELO-ratingia, joten on hankalaa sanoa minkä ELO-ratingin oma bottini saisi.
 
-Laskentasyvyyden ollessa 4 pelin kesto oli keskimäärin noin 10 minuuttia, mutta laskentasyvyydellä 5 peli saattoi kestää jopa pari tuntia.
-
-Tässä linkki muutamaan esimerkkipeliin:
-
-https://lichess.org/sp0pMGaE  Laskentasyvyys 5, Stockfish taso 3, tasapeli aseman toiston takia. Pelin kesto noin tunti.
-
-https://lichess.org/cVEJj2rX  Laskentasyvyys 4, Stockfish taso 3, voitto. Pelin kesto 14 minuuttia 54 sekuntia.
-
-https://lichess.org/0STkLIbf Laskentasyvyys 4, Stockfish taso 4, häviö. Pelin kesto 16 minuuttia.
-
-https://lichess.org/A5AZW2IL Laskentasyvyys 4, Stockfish taso 4, häviö. Pelin kesto 3 minuuttai 36 sekuntia.
-
-https://lichess.org/7OfLctcL Laskentasyvyys 4, Stockfish taso 4, voitto. Pelin kesto 8 minuuttia 21 sekuntia
+[Teustausdokumentissa](https://github.com/pomiska/tiralabra-chessbot/blob/master/documentation/tiralabra_dokumentaatio/testausdokumentti.md) on linkkejä esimerkkipeleihin.
 
 ### Puutteet ja parannusehdotukset
 
