@@ -30,7 +30,13 @@ jacocoTestReport {
      
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'chess/App*')
+            fileTree(dir: it, exclude: [
+                'chess/App*',
+                'chess/connection/*',
+                'chess/engine/*',
+                'chess/model/*',
+                'chess/bot/TestBot*',
+                'logging/*'])
         }))
     } 
 }
